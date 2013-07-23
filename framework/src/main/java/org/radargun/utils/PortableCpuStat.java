@@ -18,7 +18,7 @@ import java.lang.management.OperatingSystemMXBean;
  * Date: 22/05/12
  * Sort of copy paste from a code by Galder Zamarreno
  *
- * @deprecated it is not tested!
+ * @deprecated it is not tested (most likely it is not working at all)!
  */
 @Deprecated
 public class PortableCpuStat implements CpuStat {

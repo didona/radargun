@@ -95,6 +95,8 @@ public class ProcCpuStat implements CpuStat {
          for (int i = 2; i < 6; i++) {
             ret[i - 2] = Long.parseLong(temp[i]);
          }
+         stdInput.close();
+         p.destroy();
       } catch (IOException ioe) {
          log.warn("Exception caught when parsing the CPU time: " + ioe.getMessage());
       }
