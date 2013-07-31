@@ -107,4 +107,5 @@
 	<stat displayName="NumRemoteLocalLockContentions" attributeName="NumRemoteLocalLockContentions"/>
 	<stat displayName="NumRemoteRemoteLockContentions" attributeName="NumRemoteRemoteLockContentions"/>
 </component>
+<component name="ReconfigurableReplicationManager"/>
 </stats-collector>

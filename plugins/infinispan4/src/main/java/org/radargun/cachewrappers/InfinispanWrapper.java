@@ -45,7 +45,7 @@ public class InfinispanWrapper implements CacheWrapper {
    private boolean trackNewKeys = false;
    private boolean perThreadTrackNewKeys = false;
    private static final int maxSleep = 2000;
-   private static final boolean takeAllStats = false;
+   private static final boolean takeAllStats = true;
    private boolean ignorePutResult = false;
 
 
@@ -86,7 +86,7 @@ public class InfinispanWrapper implements CacheWrapper {
          String cacheNames = cacheManager.getDefinedCacheNames();
          if (!cacheNames.contains(cacheName))
             throw new IllegalStateException("The requested cache(" + cacheName + ") is not defined. Defined cache " +
-                    "names are " + cacheNames);
+                                                  "names are " + cacheNames);
          cache = cacheManager.getCache(cacheName);
          log.warn("IgnorePutResult is " + ignorePutResult);
          if (ignorePutResult)
@@ -309,49 +309,6 @@ public class InfinispanWrapper implements CacheWrapper {
       }
    }
 
-   /**
-    * unchecked*
-    */
-   @Deprecated
-   private Map<String, String> getAllStats() {
-      log.warn("Going to dump all the stats I can");
-      MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-      String domain = cacheManager.getGlobalConfiguration().getJmxDomain();
-      Map<String, String> attrMap = new HashMap<String, String>();
-      for (ObjectName name : mBeanServer.queryNames(null, null)) {
-         log.info("Querying " + name);
-         if (name.getDomain().equals(domain)) {
-            try {
-               MBeanInfo info = mBeanServer.getMBeanInfo(name);
-               for (MBeanAttributeInfo attr : info.getAttributes()) {
-                  try {
-                     Object o = mBeanServer.getAttribute(name, attr.getName());
-                     log.trace(name + " - " + attr.getName() + " - " + o);
-                     if (o == null) {
-                        log.warn(attr.getName() + " is not available!");
-                        o = "Not_Available";
-                     }
-                     attrMap.put(attr.getName(), o.toString());
-                  } catch (MBeanException e) {
-                     e.printStackTrace();
-                  } catch (AttributeNotFoundException e) {
-                     e.printStackTrace();
-                  }
-               }
-            } catch (InstanceNotFoundException e) {
-               e.printStackTrace();
-            } catch (IntrospectionException e) {
-               e.printStackTrace();
-            } catch (ReflectionException e) {
-               e.printStackTrace();
-            }
-
-         }
-         log.warn("Discarding " + name + " as it does not have domain " + domain);
-      }
-      return attrMap;
-   }
-
 
    @Override
    public Map<String, String> getAdditionalStats() {
@@ -384,7 +341,7 @@ public class InfinispanWrapper implements CacheWrapper {
       try {
          //PEDRO's
          return isPassiveReplicationMethod != null && (isPassiveReplicationWithSwitch() ||
-                 (Boolean) isPassiveReplicationMethod.invoke(cache.getConfiguration()));
+                                                             (Boolean) isPassiveReplicationMethod.invoke(cache.getConfiguration()));
       } catch (Exception ee) {
          log.debug("isPassiveReplication method not found or can't be invoked. Assuming *no* passive replication in use");
       }
@@ -406,8 +363,8 @@ public class InfinispanWrapper implements CacheWrapper {
       if (cacheComponentString != null) {
          try {
             return "PB".equals(getAsStringAttribute(mBeanServer,
-                    new ObjectName(cacheComponentString + "ReconfigurableReplicationManager"),
-                    "currentProtocolId"));
+                                                    new ObjectName(cacheComponentString + "ReconfigurableReplicationManager"),
+                                                    "currentProtocolId"));
          } catch (Exception e) {
             log.warn("Unable to check for Passive Replication protocol");
          }
@@ -456,12 +413,12 @@ public class InfinispanWrapper implements CacheWrapper {
                String cacheName = name.getKeyProperty("name");
                String cacheManagerName = name.getKeyProperty("manager");
                return new StringBuilder(domain)
-                       .append(":type=Cache,name=")
-                       .append(cacheName.startsWith("\"") ? cacheName :
-                               ObjectName.quote(cacheName))
-                       .append(",manager=").append(cacheManagerName.startsWith("\"") ? cacheManagerName :
-                               ObjectName.quote(cacheManagerName))
-                       .append(",component=").toString();
+                     .append(":type=Cache,name=")
+                     .append(cacheName.startsWith("\"") ? cacheName :
+                                   ObjectName.quote(cacheName))
+                     .append(",manager=").append(cacheManagerName.startsWith("\"") ? cacheManagerName :
+                                                       ObjectName.quote(cacheManagerName))
+                     .append(",component=").toString();
             }
          }
       }
@@ -480,35 +437,35 @@ public class InfinispanWrapper implements CacheWrapper {
          String filePath = "top-keys-" + transport.getAddress();
 
          log.info("Collecting statistics from Stream Lib component [" + streamLibStats + "] and save them in " +
-                 filePath);
+                        filePath);
          log.debug("Attributes available are " +
-                 mBeanAttributes2String(mBeanServer.getMBeanInfo(streamLibStats).getAttributes()));
+                         mBeanAttributes2String(mBeanServer.getMBeanInfo(streamLibStats).getAttributes()));
 
          BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath));
 
          bufferedWriter.write("RemoteTopGets=" + getMapAttribute(mBeanServer, streamLibStats, "RemoteTopGets")
-                 .toString());
+               .toString());
          bufferedWriter.newLine();
          bufferedWriter.write("LocalTopGets=" + getMapAttribute(mBeanServer, streamLibStats, "LocalTopGets")
-                 .toString());
+               .toString());
          bufferedWriter.newLine();
          bufferedWriter.write("RemoteTopPuts=" + getMapAttribute(mBeanServer, streamLibStats, "RemoteTopPuts")
-                 .toString());
+               .toString());
          bufferedWriter.newLine();
          bufferedWriter.write("LocalTopPuts=" + getMapAttribute(mBeanServer, streamLibStats, "LocalTopPuts")
-                 .toString());
+               .toString());
          bufferedWriter.newLine();
          bufferedWriter.write("TopLockedKeys=" + getMapAttribute(mBeanServer, streamLibStats, "TopLockedKeys")
-                 .toString());
+               .toString());
          bufferedWriter.newLine();
          bufferedWriter.write("TopContendedKeys=" + getMapAttribute(mBeanServer, streamLibStats, "TopContendedKeys")
-                 .toString());
+               .toString());
          bufferedWriter.newLine();
          bufferedWriter.write("TopLockFailedKeys=" + getMapAttribute(mBeanServer, streamLibStats, "TopLockFailedKeys")
-                 .toString());
+               .toString());
          bufferedWriter.newLine();
          bufferedWriter.write("TopWriteSkewFailedKeys=" + getMapAttribute(mBeanServer, streamLibStats, "TopWriteSkewFailedKeys")
-                 .toString());
+               .toString());
          bufferedWriter.newLine();
          bufferedWriter.flush();
          bufferedWriter.close();
@@ -531,11 +488,23 @@ public class InfinispanWrapper implements CacheWrapper {
 
          log.info("Collecting statistics from component [" + objectName + "]");
          log.debug("Attributes available are " +
-                 mBeanAttributes2String(mBeanServer.getMBeanInfo(objectName).getAttributes()));
+                         mBeanAttributes2String(mBeanServer.getMBeanInfo(objectName).getAttributes()));
          log.trace("Attributes to be reported are " + statisticComponent.getStats());
+         if (takeAllStats) {
+            MBeanAttributeInfo[] beanAttributeInfos = mBeanServer.getMBeanInfo(objectName).getAttributes();
+            List<String> names = new ArrayList<String>();
+            for (MBeanAttributeInfo mbai : beanAttributeInfos) {
+               names.add(mbai.getName());
+            }
 
-         for (Map.Entry<String, String> entry : statisticComponent.getStats()) {
-            results.put(entry.getKey(), getAsStringAttribute(mBeanServer, objectName, entry.getValue()));
+            AttributeList al = mBeanServer.getAttributes(objectName, names.toArray(new String[names.size()]));
+            for (Attribute a : al.asList()) {
+               results.put(a.getName(), String.valueOf(a.getValue()));
+            }
+         } else {
+            for (Map.Entry<String, String> entry : statisticComponent.getStats()) {
+               results.put(entry.getKey(), getAsStringAttribute(mBeanServer, objectName, entry.getValue()));
+            }
          }
       } catch (Exception e) {
          log.warn("Unable to collect stats from Total Order Validator component");
