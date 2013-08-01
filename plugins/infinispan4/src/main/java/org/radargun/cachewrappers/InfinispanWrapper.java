@@ -498,8 +498,11 @@ public class InfinispanWrapper implements CacheWrapper {
             }
 
             AttributeList al = mBeanServer.getAttributes(objectName, names.toArray(new String[names.size()]));
+            String add;
             for (Attribute a : al.asList()) {
-               results.put(a.getName(), String.valueOf(a.getValue()));
+               add = String.valueOf(a.getValue());
+               add = add.replace(",", "__");
+               results.put(a.getName(), add);
             }
          } else {
             for (Map.Entry<String, String> entry : statisticComponent.getStats()) {
