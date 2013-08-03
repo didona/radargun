@@ -23,6 +23,15 @@ public class SyntheticXactParams extends XactParam {
    private int nodeIndex, threadIndex, numKeys, sizeOfValue, writePercentage;
    private CacheWrapper cache;
    private int readsBeforeFirstWrite;
+   private boolean masterOnlyWrites;
+
+   public boolean isMasterOnlyWrites() {
+      return masterOnlyWrites;
+   }
+
+   public void setMasterOnlyWrites(boolean masterOnlyWrites) {
+      this.masterOnlyWrites = masterOnlyWrites;
+   }
 
    public int getReadsBeforeFirstWrite() {
       return readsBeforeFirstWrite;

@@ -48,6 +48,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
    private long startTime;
    private XACT_RETRY xact_retry;
    private int readsBeforeFirstWrite = 1;
+   private boolean masterOnlyWrites = false;
 
 
    public int getReadsBeforeFirstWrite() {
@@ -109,6 +110,14 @@ public class SyntheticPutGetStressor extends PutGetStressor {
 
    public void setXact_retry(XACT_RETRY xact_retry) {
       this.xact_retry = xact_retry;
+   }
+
+   public boolean isMasterOnlyWrites() {
+      return masterOnlyWrites;
+   }
+
+   public void setMasterOnlyWrites(boolean masterOnlyWrites) {
+      this.masterOnlyWrites = masterOnlyWrites;
    }
 
    protected Map<String, String> processResults(List<Stressor> stressors) {
@@ -220,6 +229,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          params.setSizeOfValue(sizeOfValue);
          params.setCache(cacheWrapper);
          params.setReadsBeforeFirstWrite(readsBeforeFirstWrite);
+         params.setMasterOnlyWrites(masterOnlyWrites);
          return params;
       }
 

@@ -37,6 +37,7 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
    private boolean allowBlindWrites = false;
    private XACT_RETRY retryMode = XACT_RETRY.NO_RETRY;
    private int readsBeforeFirstWrite = 1;
+   private boolean masterOnlyWrites = false;
 
 
    protected Map<String, String> doWork() {
@@ -59,6 +60,7 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
       putGetStressor.setStatsSamplingInterval(statsSamplingInterval);
       putGetStressor.setXact_retry(retryMode);
       putGetStressor.setReadsBeforeFirstWrite(readsBeforeFirstWrite);
+      putGetStressor.setMasterOnlyWrites(masterOnlyWrites);
       return putGetStressor.stress(cacheWrapper);
    }
 
@@ -109,6 +111,14 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
 
    public void setRetryMode(String retry) {
       this.retryMode = XACT_RETRY.valueOf(retry);
+   }
+
+   public boolean isMasterOnlyWrites() {
+      return masterOnlyWrites;
+   }
+
+   public void setMasterOnlyWrites(String masterOnlyWrites) {
+      this.masterOnlyWrites =Boolean.valueOf(masterOnlyWrites);
    }
 
    @Override

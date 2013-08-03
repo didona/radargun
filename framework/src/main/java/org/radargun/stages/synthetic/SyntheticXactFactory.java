@@ -1,7 +1,7 @@
 package org.radargun.stages.synthetic;
 
+import org.radargun.CacheWrapper;
 import org.radargun.stressors.KeyGenerator;
-
 
 import java.util.Random;
 
@@ -35,8 +35,7 @@ public class SyntheticXactFactory extends XactFactory<SyntheticXactParams, Synth
          toRet = new SyntheticXact(params.getCache());
          toRet.setOps(ops);
          toRet.setClazz(clazz);
-      }
-      else{   //retried xact
+      } else {   //retried xact
          toRet = last;
          if (retry == XACT_RETRY.RETRY_SAME_CLASS) {    //If not the very same xact, rebuild the read/writeSet
             clazz = toRet.clazz;
@@ -50,29 +49,41 @@ public class SyntheticXactFactory extends XactFactory<SyntheticXactParams, Synth
          last.setInitServiceTime(System.nanoTime());
       }
 
-      log.trace("New xact built "+toRet.toString());
+      log.trace("New xact built " + toRet.toString());
       return toRet;
    }
 
    private xactClass computeClazz() {
-      if (!params.getCache().isTheMaster() || (1 + params.getRandom().nextInt(100)) > params.getWritePercentage())
+
+      CacheWrapper cache = params.getCache();
+      if (cache.isPassiveReplication()) {
+         if (!cache.isCoordinator())
+            return xactClass.RO;
+         if (params.isMasterOnlyWrites())
+            return xactClass.WR;
+      }
+      if ((1 + params.getRandom().nextInt(100)) > params.getWritePercentage())
          return xactClass.RO;
       return xactClass.WR;
+
    }
 
+
    /**
-    * This method builds a set containing keys to be read and <key, value> pairs to be written.  Put operations are uniformly distributed across read operations
-    * (should work also with numReads<numWrites as long as there is at least one read).
-    * If blind writes are not allowed, then writes are delayed till the first read operation. After that point, put operations are allowed and write always on the last read value
-    * (even multiple times in a row, for simplicity)
+    * This method builds a set containing keys to be read and <key, value> pairs to be written.  Put operations are
+    * uniformly distributed across read operations (should work also with numReads<numWrites as long as there is at
+    * least one read). If blind writes are not allowed, then writes are delayed till the first read operation. After
+    * that point, put operations are allowed and write always on the last read value (even multiple times in a row, for
+    * simplicity)
+    *
     * @return a readWriteSet
     */
    protected XactOp[] buildReadWriteSet() {
       int toDoRead = params.getUpReads();
       int toDoWrite = params.getUpPuts();
       int toDo = toDoRead + toDoWrite;
-      int total=toDo;
-      int writePerc = (int) (100 *  (((double) toDoWrite) / ((double) (toDo))));
+      int total = toDo;
+      int writePerc = (int) (100 * (((double) toDoWrite) / ((double) (toDo))));
       Random r = params.getRandom();
       int numKeys = params.getNumKeys();
       boolean allowBlindWrites = params.isAllowBlindWrites();
@@ -110,8 +121,8 @@ public class SyntheticXactFactory extends XactFactory<SyntheticXactParams, Synth
             keyToAccess = r.nextInt(numKeys);
             lastRead = keyToAccess;
          }
-         value = doPut?   generateRandomString(size):"";
-         ops[i] = new XactOp(keyToAccess, value , doPut);
+         value = doPut ? generateRandomString(size) : "";
+         ops[i] = new XactOp(keyToAccess, value, doPut);
          toDo--;
          if (doPut) {
             toDoWrite--;
