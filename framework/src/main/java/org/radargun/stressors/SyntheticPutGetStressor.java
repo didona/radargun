@@ -21,9 +21,20 @@ package org.radargun.stressors;/*
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import org.radargun.stages.synthetic.*;
+import org.radargun.stages.synthetic.SyntheticDistinctXactFactory;
+import org.radargun.stages.synthetic.SyntheticXact;
+import org.radargun.stages.synthetic.SyntheticXactFactory;
+import org.radargun.stages.synthetic.SyntheticXactParams;
+import org.radargun.stages.synthetic.XACT_RETRY;
+import org.radargun.stages.synthetic.xactClass;
+import org.radargun.utils.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -152,7 +163,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       startPoint = new CountDownLatch(1);
       startTime = System.nanoTime();
       for (int threadIndex = 0; threadIndex < numOfThreads; threadIndex++) {
-         Stressor stressor = new SyntheticStressor(threadIndex, keyGenerator, nodeIndex, numberOfKeys);
+         Stressor stressor = new SyntheticStressor(threadIndex, (KeyGenerator) Utils.instantiate(this.getKeyGeneratorClass()), nodeIndex, numberOfKeys);
          stressors.add(stressor);
          stressor.start();
       }
@@ -169,15 +180,15 @@ public class SyntheticPutGetStressor extends PutGetStressor {
    private class SyntheticStressor extends Stressor {
 
 
-      private KeyGenerator keyGen;
+      private KeyGenerator perThreadKeyGen;
       private int nodeIndex, threadIndex, numKeys;
       private long writes, reads, localAborts, remoteAborts;
       private long writeSuxExecutionTime = 0, readOnlySuxExecutionTime = 0, initTime = 0, commitTime = 0;
       private Random r = new Random();
 
-      SyntheticStressor(int threadIndex, KeyGenerator keyGen, int nodeIndex, int numKeys) {
+      SyntheticStressor(int threadIndex, KeyGenerator perThreadKeyGen, int nodeIndex, int numKeys) {
          super(threadIndex);
-         this.keyGen = keyGen;
+         this.perThreadKeyGen = perThreadKeyGen;
          this.nodeIndex = nodeIndex;
          this.threadIndex = threadIndex;
          this.numKeys = numKeys;
@@ -196,7 +207,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       private SyntheticXactParams buildParams() {
          SyntheticXactParams params = new SyntheticXactParams();
          params.setRandom(r);
-         params.setKeyGenerator(keyGenerator);
+         params.setKeyGenerator(perThreadKeyGen);
          params.setNodeIndex(nodeIndex);
          params.setThreadIndex(threadIndex);
          params.setAllowBlindWrites(allowBlindWrites);
