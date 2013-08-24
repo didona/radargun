@@ -240,7 +240,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          SyntheticXact last = null;
          try {
             startPoint.await();
-            log.trace("Starting thread: " + getName());
+            if(log.isTraceEnabled()) log.trace("Starting thread: " + getName());
          } catch (InterruptedException e) {
             log.warn(e);
          }
@@ -248,9 +248,9 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          while (completion.moreToRun()) {
             try {
                last = factory.buildXact(last);
-               log.trace(threadIndex + " starting new xact " + "initService " + last.getInitServiceTime() + " initResponse " + last.getInitResponseTime());
+               if(log.isTraceEnabled()) log.trace(threadIndex + " starting new xact " + "initService " + last.getInitServiceTime() + " initResponse " + last.getInitResponseTime());
                outcome = doXact(last);
-               log.trace(threadIndex + " ending xact");
+               if(log.isTraceEnabled()) log.trace(threadIndex + " ending xact");
             } catch (Exception e) {
                log.warn("Unexpected exception" + e.getMessage());
                if (log.isTraceEnabled())
@@ -284,7 +284,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
             initTime += System.nanoTime() - now;
             xact.executeLocally();
          } catch (Exception e) {
-            log.trace("Rollback while running locally");
+            if(log.isTraceEnabled()) log.trace("Rollback while running locally");
             if (log.isTraceEnabled())
                e.printStackTrace();
             cacheWrapper.endTransaction(false);
@@ -298,7 +298,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
             if (write)
                commitTime += System.nanoTime() - now;
          } catch (Exception e) {
-            log.trace("Rollback at prepare time");
+            if(log.isTraceEnabled()) log.trace("Rollback at prepare time");
             if (!xact.clazz.equals(xactClass.WR)) {
                e.printStackTrace();
             }
@@ -318,15 +318,15 @@ public class SyntheticPutGetStressor extends PutGetStressor {
             case RO: {
                reads++;
                readOnlySuxExecutionTime += serviceTime;
-               log.trace(threadIndex + " ending RO xact at time " + now + " started at " + xact.getInitServiceTime() + " totalService " + serviceTime);
-               log.trace("readOnlyTotal " + readOnlySuxExecutionTime);
+               if(log.isTraceEnabled()) log.trace(threadIndex + " ending RO xact at time " + now + " started at " + xact.getInitServiceTime() + " totalService " + serviceTime);
+               if(log.isTraceEnabled()) log.trace("readOnlyTotal " + readOnlySuxExecutionTime);
                break;
             }
             case WR: {
                writes++;
                writeSuxExecutionTime += serviceTime;
-               log.trace(threadIndex + " ending WR xact at time " + now + " started at " + xact.getInitServiceTime() + " totalService " + serviceTime);
-               log.trace("WriteTotal " + writeSuxExecutionTime);
+               if(log.isTraceEnabled()) log.trace(threadIndex + " ending WR xact at time " + now + " started at " + xact.getInitServiceTime() + " totalService " + serviceTime);
+               if(log.isTraceEnabled()) log.trace("WriteTotal " + writeSuxExecutionTime);
                break;
             }
             default:

@@ -49,7 +49,8 @@ public class SyntheticXactFactory extends XactFactory<SyntheticXactParams, Synth
          last.setInitServiceTime(System.nanoTime());
       }
 
-      log.trace("New xact built " + toRet.toString());
+      if(log.isTraceEnabled())
+         log.trace("New xact built " + toRet.toString());
       return toRet;
    }
 

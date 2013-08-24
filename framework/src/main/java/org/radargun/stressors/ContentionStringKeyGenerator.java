@@ -39,7 +39,6 @@ public class ContentionStringKeyGenerator extends StringKeyGenerator{
 
    @Override
    public Object generateKey(int nodeIndex, int threadIndex, int keyIndex) {
-      log.trace("Key "+super.generateKey(CONTEND, CONTEND, keyIndex));
       return super.generateKey(CONTEND, CONTEND, keyIndex);    //To change body of overridden methods use File | Settings | File Templates.
    }
 }
