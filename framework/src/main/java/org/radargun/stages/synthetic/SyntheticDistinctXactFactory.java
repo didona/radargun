@@ -20,8 +20,7 @@ public class SyntheticDistinctXactFactory extends SyntheticXactFactory {
    public SyntheticDistinctXactFactory(SyntheticXactParams params) {
       super(params);
       rwB = this.rwB();
-
-      log.trace(Arrays.toString(rwB));
+      if (log.isTraceEnabled()) log.trace(Arrays.toString(rwB));
    }
 
    @Override
@@ -49,7 +48,7 @@ public class SyntheticDistinctXactFactory extends SyntheticXactFactory {
                while (readSet.contains(key));  //avoid repetitions
                readSet.add(0, key);
                ops[i] = new XactOp(kg.generateKey(nodeIndex, threadIndex, key),
-                                   null, false);    //add a read op and increment
+                       null, false);    //add a read op and increment
             } else {    //Put
                if (bW) {        //You can have (distinct) blind writes
                   do {
@@ -58,10 +57,10 @@ public class SyntheticDistinctXactFactory extends SyntheticXactFactory {
                   while (writeSet.contains(key));  //avoid repetitions among writes
                   writeSet.add(0, key);
                   ops[i] = new XactOp(kg.generateKey(nodeIndex, threadIndex, key),
-                                      generateRandomString(sizeS), true);    //add a write op
+                          generateRandomString(sizeS), true);    //add a write op
                } else { //No blind writes: Take a value already read and increment         To have distinct writes, remember numWrites<=numReads in this case
                   ops[i] = new XactOp(ops[nextWrite++].getKey(),
-                                      generateRandomString(sizeS), true);
+                          generateRandomString(sizeS), true);
 
                   while (nextWrite < total && rwB[nextWrite]) {       //while it is a put op, go on
                      nextWrite++;
@@ -72,15 +71,16 @@ public class SyntheticDistinctXactFactory extends SyntheticXactFactory {
       } catch (Exception e) {
          e.printStackTrace();
       }
-      log.trace(ops);
+      if (log.isTraceEnabled())
+         log.trace(ops);
       return ops;
    }
-
 
    /**
     * @return A boolean array. True means put, false means get
     */
    private boolean[] rwB() {
+      final boolean trace = log.isTraceEnabled();
       int numReads = params.getUpReads();
       int numWrites = params.getUpPuts();
       int total = numReads + numWrites;
@@ -116,19 +116,20 @@ public class SyntheticDistinctXactFactory extends SyntheticXactFactory {
             groupRead = remainingWrites > 0 ? (int) Math.floor(remainingReads / remainingWrites) : (int) remainingReads;
             groupWrite = remainingWrites > 0 ? 1 : 0;
             numGroups = remainingWrites > 0 ? (int) remainingWrites : 1;
-            log.trace("More remaining reads than write: " + remainingReads + " vs " + remainingWrites);
+            if (trace) log.trace("More remaining reads than write: " + remainingReads + " vs " + remainingWrites);
             log.trace("I will have " + numGroups + " groups of " + groupRead + " reads and " + groupWrite + " writes");
          } else {
             moreReads = false;
             groupRead = remainingReads > 0 ? 1 : 0;
             groupWrite = remainingReads > 0 ? (int) Math.floor(remainingWrites / remainingReads) : (int) remainingWrites;
             numGroups = remainingReads > 0 ? (int) remainingReads : 1;
-            log.trace("More remaining writes than reads: " + remainingWrites + " vs " + remainingReads);
-            log.trace("I will have " + numGroups + " groups of " + groupRead + " reads and " + groupWrite + " writes");
+            if (trace) log.trace("More remaining writes than reads: " + remainingWrites + " vs " + remainingReads);
+            if (trace)
+               log.trace("I will have " + numGroups + " groups of " + groupRead + " reads and " + groupWrite + " writes");
          }
          int index = fW + 1;
          while (numGroups-- > 0) {
-            log.trace(numGroups + " groups to go");
+            if (trace) log.trace(numGroups + " groups to go");
             int r = groupRead;
             int w = groupWrite;
             while (r-- > 0) {
@@ -148,6 +149,4 @@ public class SyntheticDistinctXactFactory extends SyntheticXactFactory {
       return rwB;
 
    }
-
-
 }
