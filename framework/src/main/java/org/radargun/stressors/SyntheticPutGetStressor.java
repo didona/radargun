@@ -194,6 +194,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       private long writes, reads, localAborts, remoteAborts;
       private long writeSuxExecutionTime = 0, readOnlySuxExecutionTime = 0, initTime = 0, commitTime = 0;
       private Random r = new Random();
+      SyntheticXactFactory factory;
 
       SyntheticStressor(int threadIndex, KeyGenerator perThreadKeyGen, int nodeIndex, int numKeys) {
          super(threadIndex);
@@ -201,6 +202,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          this.nodeIndex = nodeIndex;
          this.threadIndex = threadIndex;
          this.numKeys = numKeys;
+         this.factory = new SyntheticDistinctXactFactory(buildParams());
       }
 
       @Override
@@ -234,8 +236,6 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       }
 
       private void runInternal() {
-
-         SyntheticXactFactory factory = new SyntheticDistinctXactFactory(buildParams());
          result outcome;
          SyntheticXact last = null;
          try {
@@ -277,7 +277,6 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          }
       }
 
-
       private result doXact(SyntheticXact xact) {
          try {
             long now = System.nanoTime();
@@ -310,7 +309,6 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          xact.setCommit(true);
          return result.COM;
       }
-
 
       private void sampleCommit(SyntheticXact xact) {
          xactClass clazz = xact.clazz;
@@ -365,8 +363,6 @@ public class SyntheticPutGetStressor extends PutGetStressor {
             }
          }
       }
-
-
    }
 
 
