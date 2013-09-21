@@ -21,14 +21,17 @@ package org.radargun.stressors;/*
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import org.radargun.stages.synthetic.SyntheticDistinctXactFactory;
+import org.radargun.stages.synthetic.SyntheticDistinctXactFactory_PreDaP;
 import org.radargun.stages.synthetic.SyntheticXact;
 import org.radargun.stages.synthetic.SyntheticXactFactory;
+import org.radargun.stages.synthetic.SyntheticXactFactory_RunTimeDaP;
 import org.radargun.stages.synthetic.SyntheticXactParams;
 import org.radargun.stages.synthetic.XACT_RETRY;
 import org.radargun.stages.synthetic.xactClass;
 import org.radargun.utils.Utils;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -51,6 +54,9 @@ public class SyntheticPutGetStressor extends PutGetStressor {
    private boolean masterOnlyWrites = false;
    final boolean traceE = log.isTraceEnabled();
 
+   private boolean precomputeRWset = false;
+   private boolean sampleNTCBServiceTime = false;
+
 
    public int getReadsBeforeFirstWrite() {
       return readsBeforeFirstWrite;
@@ -72,6 +78,13 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       this.startTime = startTime;
    }
 
+   public void setPrecomputeRWset(boolean precomputeRWset) {
+      this.precomputeRWset = precomputeRWset;
+   }
+
+   public void setSampleNTCBServiceTime(boolean sampleNTCBServiceTime) {
+      this.sampleNTCBServiceTime = sampleNTCBServiceTime;
+   }
 
    public int getupdateXactWrites() {
       return updateXactWrites;
@@ -133,6 +146,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       long commitTime = 0;
       long wrResponse = 0;
       long ntcb = 0;
+      long ntcbS = 0;
       duration = (long) (1e-6 * (System.nanoTime() - startTime));
       for (Stressor stressorrrr : stressors) {
          SyntheticStressor stressor = (SyntheticStressor) stressorrrr;
@@ -145,7 +159,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          initTime += stressor.initTime;
          commitTime += stressor.commitTime;
          wrResponse+=stressor.writeResponseTime;
-         ntcb+=stressor.timeBetweenTwoXact;
+         ntcb+=stressor.timeBetweenTwoXactR;
       }
 
       Map<String, String> results = new LinkedHashMap<String, String>();
@@ -200,8 +214,10 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       private int nodeIndex, threadIndex, numKeys;
       private long writes, reads, localAborts, remoteAborts;
       private long writeSuxExecutionTime = 0, readOnlySuxExecutionTime = 0, initTime = 0, commitTime = 0, writeResponseTime = 0;
-      private long lastInit, lastEnd, timeBetweenTwoXact;
+      private long lastEndR, timeBetweenTwoXactR, lastEndS, timeBetweenTwoXactS;
       private Random r = new Random();
+      final boolean sampleNTCBS = sampleNTCBServiceTime;
+      final ThreadMXBean threadMXBean = sampleNTCBS? ManagementFactory.getThreadMXBean():null;
       SyntheticXactFactory factory;
 
       SyntheticStressor(int threadIndex, KeyGenerator perThreadKeyGen, int nodeIndex, int numKeys) {
@@ -210,7 +226,15 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          this.nodeIndex = nodeIndex;
          this.threadIndex = threadIndex;
          this.numKeys = numKeys;
-         this.factory = new SyntheticDistinctXactFactory(buildParams());
+         if(precomputeRWset){
+            this.factory = new SyntheticDistinctXactFactory_PreDaP(buildParams());
+         }
+         else{
+            this.factory = new SyntheticXactFactory_RunTimeDaP(buildParams());
+         }
+         if(traceE){
+            log.trace("Xact factory built "+factory.toString());
+         }
       }
 
       @Override
@@ -252,10 +276,21 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          } catch (InterruptedException e) {
             log.warn(e);
          }
+         //The first xact does not have any NTCB
+         //Init lastEndR here, so that the very first time you compute the time between two xact you get a small value (~0)
+         //without having to check every time if this is the first xact
+         lastEndR = System.nanoTime();
+         if(sampleNTCBS){
+            lastEndS = threadMXBean.getCurrentThreadCpuTime();
+         }
 
          while (completion.moreToRun()) {
             try {
                last = factory.buildXact(last);
+               if(sampleNTCBS){
+                  timeBetweenTwoXactS+= threadMXBean.getCurrentThreadCpuTime() - lastEndS;
+               }
+               timeBetweenTwoXactR +=System.nanoTime() - lastEndR;
                if (traceE)
                   log.trace(threadIndex + " starting new xact " + "initService " + last.getInitServiceTime() + " initResponse " + last.getInitResponseTime());
                outcome = doXact(last);
@@ -287,9 +322,10 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       }
 
       private result doXact(SyntheticXact xact) {
+         xactClass clazz = xact.getClazz();
          try {
             long now = System.nanoTime();
-            timeBetweenTwoXact+=(now-lastEnd);
+            timeBetweenTwoXactR +=(now- lastEndR);
             cacheWrapper.startTransaction();
             initTime += System.nanoTime() - now;
             xact.executeLocally();
@@ -299,25 +335,34 @@ public class SyntheticPutGetStressor extends PutGetStressor {
                e.printStackTrace();
             }
             cacheWrapper.endTransaction(false);
-            lastEnd = System.nanoTime();
+            if(sampleNTCBS){
+               lastEndS = threadMXBean.getCurrentThreadCpuTime();
+            }
+            lastEndR = System.nanoTime();
             return result.AB_L;
          }
 
          try {
-            boolean write = xact.clazz.equals(xactClass.WR);
-            long initCommitTime = write ? System.nanoTime() : 0;
+            boolean write = clazz.equals(xactClass.WR);
+            long now = System.nanoTime();
+            long initCommitTime = write ? now : 0;
             cacheWrapper.endTransaction(true);
-            lastEnd = System.nanoTime();
+            if(sampleNTCBS){
+               timeBetweenTwoXactS+= threadMXBean.getCurrentThreadCpuTime() - lastEndS;
+            }
+            now = System.nanoTime();
+            lastEndR = now;
             if (write) {
-               commitTime += System.nanoTime() - initCommitTime;
+               commitTime += now - initCommitTime;
             }
          } catch (Exception e) {
-            if (log.isTraceEnabled()) log.trace("Rollback at prepare time");
-            if (!xact.clazz.equals(xactClass.WR)) {
+            if (traceE) log.trace("Rollback at prepare time");
+            if (traceE ||!clazz.equals(xactClass.WR) )
                e.printStackTrace();
+            if(sampleNTCBS){
+               timeBetweenTwoXactS+= threadMXBean.getCurrentThreadCpuTime() - lastEndS;
             }
-            if (log.isTraceEnabled())
-               e.printStackTrace();
+            lastEndR = System.nanoTime();
             return result.AB_R;
          }
          xact.setCommit(true);
@@ -325,7 +370,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       }
 
       private void sampleCommit(SyntheticXact xact) {
-         xactClass clazz = xact.clazz;
+         xactClass clazz = xact.getClazz();
          long now = System.nanoTime();
          long serviceTime = now - xact.getInitServiceTime();
          switch (clazz) {
@@ -354,7 +399,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       }
 
       private void sampleLocalAbort(SyntheticXact xact) {
-         xactClass clazz = xact.clazz;
+         xactClass clazz = xact.getClazz();
          switch (clazz) {
             case WR: {
                localAborts++;
@@ -369,7 +414,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       }
 
       private void sampleRemoteAbort(SyntheticXact xact) {
-         xactClass clazz = xact.clazz;
+         xactClass clazz = xact.getClazz();
          switch (clazz) {
             case WR: {
                remoteAborts++;

@@ -11,17 +11,17 @@ import java.util.Random;
  * @author diego
  * @since 4.0
  */
-public class SyntheticXactFactory extends XactFactory<SyntheticXactParams, SyntheticXact> {
+public abstract class SyntheticXactFactory <P extends SyntheticXactParams, S extends SyntheticXact> extends XactFactory<P, S> {
 
-   public SyntheticXactFactory(SyntheticXactParams params) {
+   public SyntheticXactFactory(P params) {
       super(params);
+
    }
 
    @Override
-   public SyntheticXact buildXact(SyntheticXact last) {
-
+   public final S buildXact(S last) {
       XACT_RETRY retry = params.getXact_retry();
-      SyntheticXact toRet;
+      S toRet;
       xactClass clazz;
       XactOp[] ops;
       if (retry == XACT_RETRY.NO_RETRY || last == null || last.isCommit()) {    //brand new xact
@@ -31,14 +31,13 @@ public class SyntheticXactFactory extends XactFactory<SyntheticXactParams, Synth
          } else {
             ops = buildReadWriteSet();
          }
-
-         toRet = new SyntheticXact(params.getCache());
+         toRet = generateXact(params);//new SyntheticXact(params.getCache());
          toRet.setOps(ops);
          toRet.setClazz(clazz);
       } else {   //retried xact
          toRet = last;
          if (retry == XACT_RETRY.RETRY_SAME_CLASS) {    //If not the very same xact, rebuild the read/writeSet
-            clazz = toRet.clazz;
+            clazz = toRet.getClazz();
             if (clazz == xactClass.RO) {
                ops = buildReadSet();
             } else {
@@ -53,22 +52,6 @@ public class SyntheticXactFactory extends XactFactory<SyntheticXactParams, Synth
          log.trace("New xact built " + toRet.toString());
       return toRet;
    }
-
-   private xactClass computeClazz() {
-
-      CacheWrapper cache = params.getCache();
-      if (cache.isPassiveReplication()) {
-         if (!cache.isCoordinator())
-            return xactClass.RO;
-         if (params.isMasterOnlyWrites())
-            return xactClass.WR;
-      }
-      if ((1 + params.getRandom().nextInt(100)) > params.getWritePercentage())
-         return xactClass.RO;
-      return xactClass.WR;
-
-   }
-
 
    /**
     * This method builds a set containing keys to be read and <key, value> pairs to be written.  Put operations are
@@ -134,7 +117,7 @@ public class SyntheticXactFactory extends XactFactory<SyntheticXactParams, Synth
       return ops;
    }
 
-   private XactOp[] buildReadSet() {
+   protected XactOp[] buildReadSet() {
       int numR = params.getROGets();
       XactOp[] ops = new XactOp[numR];
       KeyGenerator keyGen = params.getKeyGenerator();
@@ -153,11 +136,28 @@ public class SyntheticXactFactory extends XactFactory<SyntheticXactParams, Synth
       return ops;
    }
 
-   protected String generateRandomString(int size) {
+   protected final xactClass computeClazz() {
+
+      CacheWrapper cache = params.getCache();
+      if (cache.isPassiveReplication()) {
+         if (!cache.isCoordinator())
+            return xactClass.RO;
+         if (params.isMasterOnlyWrites())
+            return xactClass.WR;
+      }
+      if ((1 + params.getRandom().nextInt(100)) > params.getWritePercentage())
+         return xactClass.RO;
+      return xactClass.WR;
+
+   }
+
+   protected final String generateRandomString(int size) {
       // each char is 2 bytes
       StringBuilder sb = new StringBuilder();
       for (int i = 0; i < size / 2; i++) sb.append((char) (64 + params.getRandom().nextInt(26)));
       return sb.toString();
    }
+
+   protected abstract S generateXact(P params);
 
 }

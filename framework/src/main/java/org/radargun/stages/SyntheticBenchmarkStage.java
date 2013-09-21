@@ -38,6 +38,8 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
    private XACT_RETRY retryMode = XACT_RETRY.NO_RETRY;
    private int readsBeforeFirstWrite = 1;
    private boolean masterOnlyWrites = false;
+   private boolean precomputeRWset = false;
+   private boolean sampleNTCBServiceTime = false;
 
 
    protected Map<String, String> doWork() {

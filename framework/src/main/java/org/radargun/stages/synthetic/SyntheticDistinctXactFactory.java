@@ -1,11 +1,6 @@
 package org.radargun.stages.synthetic;
 
-import org.radargun.stressors.KeyGenerator;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
 
 /**
  * // TODO: Document this
@@ -13,67 +8,14 @@ import java.util.Random;
  * @author diego
  * @since 4.0
  */
-public class SyntheticDistinctXactFactory extends SyntheticXactFactory {
+public abstract class SyntheticDistinctXactFactory <P extends SyntheticXactParams, S extends SyntheticXact> extends SyntheticXactFactory<P,S> {
 
-   private boolean[] rwB;
+   protected boolean[] rwB;
 
-   public SyntheticDistinctXactFactory(SyntheticXactParams params) {
+   public SyntheticDistinctXactFactory(P params) {
       super(params);
       rwB = this.rwB();
       if (log.isTraceEnabled()) log.trace(Arrays.toString(rwB));
-   }
-
-   @Override
-   protected XactOp[] buildReadWriteSet() {
-      XactOp[] ops = new XactOp[rwB.length];
-      List<Integer> readSet = new ArrayList<Integer>(), writeSet = new ArrayList<Integer>();
-      int numReads = params.getUpReads();
-      int numWrites = params.getUpPuts();
-      int total = numReads + numWrites;
-      KeyGenerator kg = params.getKeyGenerator();
-      Random r = params.getRandom();
-      int nodeIndex = params.getNodeIndex(), threadIndex = params.getThreadIndex();
-      int sizeS = params.getSizeOfValue();
-      boolean bW = params.isAllowBlindWrites();
-      int numK = params.getNumKeys();
-      Integer key;
-      int nextWrite = 0; //without blind writes, this points to the next read item to write
-      //Generate rwSet
-      try {
-         for (int i = 0; i < total; i++) {
-            if (!rwB[i]) {  //Read
-               do {
-                  key = r.nextInt(numK);
-               }
-               while (readSet.contains(key));  //avoid repetitions
-               readSet.add(0, key);
-               ops[i] = new XactOp(kg.generateKey(nodeIndex, threadIndex, key),
-                       null, false);    //add a read op and increment
-            } else {    //Put
-               if (bW) {        //You can have (distinct) blind writes
-                  do {
-                     key = r.nextInt(numK);
-                  }
-                  while (writeSet.contains(key));  //avoid repetitions among writes
-                  writeSet.add(0, key);
-                  ops[i] = new XactOp(kg.generateKey(nodeIndex, threadIndex, key),
-                          generateRandomString(sizeS), true);    //add a write op
-               } else { //No blind writes: Take a value already read and increment         To have distinct writes, remember numWrites<=numReads in this case
-                  ops[i] = new XactOp(ops[nextWrite++].getKey(),
-                          generateRandomString(sizeS), true);
-
-                  while (nextWrite < total && rwB[nextWrite]) {       //while it is a put op, go on
-                     nextWrite++;
-                  }
-               }
-            }
-         }
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
-      if (log.isTraceEnabled())
-         log.trace(ops);
-      return ops;
    }
 
    /**
