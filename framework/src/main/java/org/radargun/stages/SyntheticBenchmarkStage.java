@@ -63,6 +63,8 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
       putGetStressor.setXact_retry(retryMode);
       putGetStressor.setReadsBeforeFirstWrite(readsBeforeFirstWrite);
       putGetStressor.setMasterOnlyWrites(masterOnlyWrites);
+      putGetStressor.setSampleNTCBServiceTime(sampleNTCBServiceTime);
+      putGetStressor.setPrecomputeRWset(precomputeRWset);
       return putGetStressor.stress(cacheWrapper);
    }
 
@@ -89,6 +91,15 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
 
    public int getReadOnlyXactSize() {
       return readOnlyXactSize;
+   }
+
+   public void setSampleNTCBServiceTime(String sampleNTCBServiceTime) {
+      this.sampleNTCBServiceTime = Boolean.valueOf(sampleNTCBServiceTime);
+   }
+
+
+   public void setPrecomputeRWset(String precomputeRWset) {
+      this.precomputeRWset = Boolean.valueOf(precomputeRWset);
    }
 
    public void setReadOnlyXactSize(int readOnlyXactSize) {
