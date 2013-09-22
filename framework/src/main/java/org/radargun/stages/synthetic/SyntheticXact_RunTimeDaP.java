@@ -76,7 +76,7 @@ public class SyntheticXact_RunTimeDaP extends SyntheticXact {
          } else {
             cache.get(null, kg.generateKey(ni, ti, r.nextInt(numKeys)));
          }
-         toDo--;
+         i++;
       }
    }
 

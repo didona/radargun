@@ -158,9 +158,9 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          suxRdService += stressor.readOnlySuxExecutionTime;
          initTime += stressor.initTime;
          commitTime += stressor.commitTime;
-         wrResponse+=stressor.writeResponseTime;
-         ntcb+=stressor.timeBetweenTwoXactR;
-         ntcbS+=stressor.timeBetweenTwoXactS;
+         wrResponse += stressor.writeResponseTime;
+         ntcb += stressor.timeBetweenTwoXactR;
+         ntcbS += stressor.timeBetweenTwoXactS;
       }
 
       Map<String, String> results = new LinkedHashMap<String, String>();
@@ -219,7 +219,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       private long lastEndR, timeBetweenTwoXactR, lastEndS, timeBetweenTwoXactS;
       private Random r = new Random();
       final boolean sampleNTCBS = sampleNTCBServiceTime;
-      final ThreadMXBean threadMXBean = sampleNTCBS? ManagementFactory.getThreadMXBean():null;
+      final ThreadMXBean threadMXBean = sampleNTCBS ? ManagementFactory.getThreadMXBean() : null;
       SyntheticXactFactory factory;
 
       SyntheticStressor(int threadIndex, KeyGenerator perThreadKeyGen, int nodeIndex, int numKeys) {
@@ -228,14 +228,13 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          this.nodeIndex = nodeIndex;
          this.threadIndex = threadIndex;
          this.numKeys = numKeys;
-         if(precomputeRWset){
+         if (precomputeRWset) {
             this.factory = new SyntheticDistinctXactFactory_PreDaP(buildParams());
-         }
-         else{
+         } else {
             this.factory = new SyntheticXactFactory_RunTimeDaP(buildParams());
          }
-         if(traceE){
-            log.trace("Xact factory built "+factory.toString());
+         if (traceE) {
+            log.trace("Xact factory built " + factory.toString());
          }
       }
 
@@ -282,17 +281,17 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          //Init lastEndR here, so that the very first time you compute the time between two xact you get a small value (~0)
          //without having to check every time if this is the first xact
          lastEndR = System.nanoTime();
-         if(sampleNTCBS){
+         if (sampleNTCBS) {
             lastEndS = threadMXBean.getCurrentThreadCpuTime();
          }
 
          while (completion.moreToRun()) {
             try {
                last = factory.buildXact(last);
-               if(sampleNTCBS){
-                  timeBetweenTwoXactS+= threadMXBean.getCurrentThreadCpuTime() - lastEndS;
+               if (sampleNTCBS) {
+                  timeBetweenTwoXactS += threadMXBean.getCurrentThreadCpuTime() - lastEndS;
                }
-               timeBetweenTwoXactR +=System.nanoTime() - lastEndR;
+               timeBetweenTwoXactR += System.nanoTime() - lastEndR;
                if (traceE)
                   log.trace(threadIndex + " starting new xact " + "initService " + last.getInitServiceTime() + " initResponse " + last.getInitResponseTime());
                outcome = doXact(last);
@@ -340,7 +339,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
                e.printStackTrace();
             }
             cacheWrapper.endTransaction(false);
-            if(sampleNTCBS){
+            if (sampleNTCBS) {
                lastEndS = threadMXBean.getCurrentThreadCpuTime();
             }
             lastEndR = System.nanoTime();
@@ -352,8 +351,8 @@ public class SyntheticPutGetStressor extends PutGetStressor {
             long now = System.nanoTime();
             long initCommitTime = write ? now : 0;
             cacheWrapper.endTransaction(true);
-            if(sampleNTCBS){
-               lastEndS= threadMXBean.getCurrentThreadCpuTime();
+            if (sampleNTCBS) {
+               lastEndS = threadMXBean.getCurrentThreadCpuTime();
             }
             now = System.nanoTime();
             lastEndR = now;
@@ -362,10 +361,10 @@ public class SyntheticPutGetStressor extends PutGetStressor {
             }
          } catch (Exception e) {
             if (traceE) log.trace("Rollback at prepare time");
-            if (traceE ||!clazz.equals(xactClass.WR) )
+            if (traceE || !clazz.equals(xactClass.WR))
                e.printStackTrace();
-            if(sampleNTCBS){
-               lastEndS= threadMXBean.getCurrentThreadCpuTime();
+            if (sampleNTCBS) {
+               lastEndS = threadMXBean.getCurrentThreadCpuTime();
             }
             lastEndR = System.nanoTime();
             return result.AB_R;
