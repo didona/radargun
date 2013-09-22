@@ -326,11 +326,11 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       private result doXact(SyntheticXact xact) {
          xactClass clazz = xact.getClazz();
          try {
-            if(sampleNTCBS){
+            /*if(sampleNTCBS){
                timeBetweenTwoXactS+= threadMXBean.getCurrentThreadCpuTime() - lastEndS;
-            }
+            }       */
             long now = System.nanoTime();
-            timeBetweenTwoXactR +=(now- lastEndR);
+            //timeBetweenTwoXactR +=(now- lastEndR);
             cacheWrapper.startTransaction();
             initTime += System.nanoTime() - now;
             xact.executeLocally();
@@ -353,7 +353,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
             long initCommitTime = write ? now : 0;
             cacheWrapper.endTransaction(true);
             if(sampleNTCBS){
-               lastEndS+= threadMXBean.getCurrentThreadCpuTime();
+               lastEndS= threadMXBean.getCurrentThreadCpuTime();
             }
             now = System.nanoTime();
             lastEndR = now;
@@ -365,7 +365,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
             if (traceE ||!clazz.equals(xactClass.WR) )
                e.printStackTrace();
             if(sampleNTCBS){
-               lastEndS+= threadMXBean.getCurrentThreadCpuTime();
+               lastEndS= threadMXBean.getCurrentThreadCpuTime();
             }
             lastEndR = System.nanoTime();
             return result.AB_R;
