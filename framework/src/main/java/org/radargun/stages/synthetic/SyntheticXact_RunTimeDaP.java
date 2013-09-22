@@ -1,5 +1,7 @@
 package org.radargun.stages.synthetic;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
 import org.radargun.stressors.KeyGenerator;
 
@@ -17,6 +19,8 @@ public class SyntheticXact_RunTimeDaP extends SyntheticXact {
    private SyntheticXactParams params;
    protected boolean[] RWB;
 
+   private final static Log log = LogFactory.getLog(SyntheticXactFactory_RunTimeDaP.class);
+   private final static boolean trace = log.isTraceEnabled();
    //TODO: now this is ONLY for RR. The extension for GMU without blind writes has to be created.
    //TODO: this is not optimized for encounter time locking: reads and writes can happen at any place in the xact
 
@@ -65,8 +69,9 @@ public class SyntheticXact_RunTimeDaP extends SyntheticXact {
       int ni = params.getNodeIndex();
       Random r = params.getRandom();
       int size = params.getSizeOfValue();
-      while (toDo > 0) {
-         if (RWB[toDo]) {
+      int i = 0;
+      while (i < toDo) {
+         if (RWB[i]) {
             cache.put(null, kg.generateKey(ni, ti, r.nextInt(numKeys)), generateRandomString(size));
          } else {
             cache.get(null, kg.generateKey(ni, ti, r.nextInt(numKeys)));
