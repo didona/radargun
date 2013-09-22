@@ -160,6 +160,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          commitTime += stressor.commitTime;
          wrResponse+=stressor.writeResponseTime;
          ntcb+=stressor.timeBetweenTwoXactR;
+         ntcbS+=stressor.timeBetweenTwoXactS;
       }
 
       Map<String, String> results = new LinkedHashMap<String, String>();
@@ -181,6 +182,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       results.put("DATA_ACCESS_PATTERN", str("UNIFORM"));
       results.put("READS_BEFORE_FIRST_WRITE", str(readsBeforeFirstWrite));
       results.put("RG_NTCB", str(((double) ntcb) / ((double) (localFailures + remoteFailures + reads + writes)) / 1000));
+      results.put("RG_NTCB_S", str(((double) ntcbS) / ((double) (localFailures + remoteFailures + reads + writes)) / 1000));
       results.putAll(cacheWrapper.getAdditionalStats());
       return results;
 
