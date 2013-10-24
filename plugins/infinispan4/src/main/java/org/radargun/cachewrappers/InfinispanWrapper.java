@@ -89,6 +89,7 @@ public class InfinispanWrapper implements CacheWrapper {
                                                   "names are " + cacheNames);
          cache = cacheManager.getCache(cacheName);
          log.warn("IgnorePutResult is " + ignorePutResult);
+         System.out.println("IgnorePutResult is " + ignorePutResult);
          if (ignorePutResult)
             writeCache = cache.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES);
          else
