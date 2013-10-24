@@ -27,7 +27,7 @@ public class SyntheticXactFactory_RunTimeDaP extends SyntheticDistinctXactFactor
 
    @Override
    protected SyntheticXact_RunTimeDaP generateXact(SyntheticXactParams p) {
-      SyntheticXact_RunTimeDaP s = new SyntheticXact_RunTimeDaP(p.getCache());
+      SyntheticXact_RunTimeDaP s = new SyntheticXact_RunTimeDaP(p);
       s.setRoRead(roRead);
       s.setUpRead(upRead);
       s.setUpWrite(upWrite);

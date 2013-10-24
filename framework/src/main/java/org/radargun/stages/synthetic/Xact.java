@@ -16,10 +16,10 @@ public abstract class Xact {
 
    private boolean isCommit;  //we track only commit-abort without considering also xact that can abort because of application logic (and might be not restarted, then)
 
-   public Xact(CacheWrapper wrapper) {
+   public Xact(SyntheticXactParams p) {
       initResponseTime = System.nanoTime();
       initServiceTime = initResponseTime;
-      cache = wrapper;
+      cache = p.getCache();
    }
 
    public void setCache(CacheWrapper wrapper) {

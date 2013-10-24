@@ -11,7 +11,7 @@ import java.util.Random;
  * @author diego
  * @since 4.0
  */
-public abstract class SyntheticXactFactory <P extends SyntheticXactParams, S extends SyntheticXact> extends XactFactory<P, S> {
+public abstract class SyntheticXactFactory<P extends SyntheticXactParams, S extends SyntheticXact> extends XactFactory<P, S> {
 
    public SyntheticXactFactory(P params) {
       super(params);
@@ -48,7 +48,7 @@ public abstract class SyntheticXactFactory <P extends SyntheticXactParams, S ext
          last.setInitServiceTime(System.nanoTime());
       }
 
-      if(log.isTraceEnabled())
+      if (log.isTraceEnabled())
          log.trace("New xact built " + toRet.toString());
       return toRet;
    }
@@ -118,6 +118,7 @@ public abstract class SyntheticXactFactory <P extends SyntheticXactParams, S ext
    }
 
    protected XactOp[] buildReadSet() {
+      log.warn("Beware: read only xact do not have distinct accesses");
       int numR = params.getROGets();
       XactOp[] ops = new XactOp[numR];
       KeyGenerator keyGen = params.getKeyGenerator();

@@ -1,12 +1,12 @@
 package org.radargun.stages.synthetic;
 
-import org.radargun.CacheWrapper;
 import org.radargun.stressors.KeyGenerator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * // TODO: Document this
@@ -16,9 +16,42 @@ import java.util.Random;
  */
 public class SyntheticDistinctXactFactory_PreDaP extends SyntheticDistinctXactFactory<SyntheticXactParams, SyntheticXact_PreDap> {
 
+   private final static int NOT_ACCESSED = -1;
 
    public SyntheticDistinctXactFactory_PreDaP(SyntheticXactParams params) {
       super(params);
+      if (params.getNumKeys() < params.getROGets()) {
+         log.fatal("You cannot read distinct keys if the number of keys is less than the number of accesses");
+         throw new IllegalArgumentException("You cannot read distinct keys if the number of keys is less than the number of accesses");
+      }
+   }
+
+   protected XactOp[] buildReadSet() {
+      int numR = params.getROGets();
+      XactOp[] ops = new XactOp[numR];
+      KeyGenerator keyGen = params.getKeyGenerator();
+      Object key;
+      int keyToAccess;
+      Random r = params.getRandom();
+      int numKeys = params.getNumKeys();
+      int nodeIndex = params.getNodeIndex();
+      int threadIndex = params.getThreadIndex();
+      Set<Integer> alreadyRead = new HashSet<Integer>();
+      boolean okRead;
+      for (int i = 0; i < numR; i++) {
+         okRead = false;
+         do {
+            keyToAccess = r.nextInt(numKeys);
+            if (!alreadyRead.contains(keyToAccess))
+               okRead = true;
+         }
+         while (!okRead);
+
+         key = keyGen.generateKey(nodeIndex, threadIndex, keyToAccess);
+         alreadyRead.add(keyToAccess);
+         ops[i] = new XactOp(key, "", false);
+      }
+      return ops;
    }
 
    @Override
@@ -35,7 +68,7 @@ public class SyntheticDistinctXactFactory_PreDaP extends SyntheticDistinctXactFa
       boolean bW = params.isAllowBlindWrites();
       int numK = params.getNumKeys();
       Integer key;
-      int nextWrite = 0; //without blind writes, this points to the next read item to write
+      int nextWrite = 0; //without blind writes, this points to the next read item to write. The first operation is a read
       //Generate rwSet
       try {
          for (int i = 0; i < total; i++) {
@@ -46,7 +79,7 @@ public class SyntheticDistinctXactFactory_PreDaP extends SyntheticDistinctXactFa
                while (readSet.contains(key));  //avoid repetitions
                readSet.add(0, key);
                ops[i] = new XactOp(kg.generateKey(nodeIndex, threadIndex, key),
-                       null, false);    //add a read op and increment
+                                   null, false);    //add a read op and increment
             } else {    //Put
                if (bW) {        //You can have (distinct) blind writes
                   do {
@@ -55,12 +88,12 @@ public class SyntheticDistinctXactFactory_PreDaP extends SyntheticDistinctXactFa
                   while (writeSet.contains(key));  //avoid repetitions among writes
                   writeSet.add(0, key);
                   ops[i] = new XactOp(kg.generateKey(nodeIndex, threadIndex, key),
-                          generateRandomString(sizeS), true);    //add a write op
+                                      generateRandomString(sizeS), true);    //add a write op
                } else { //No blind writes: Take a value already read and increment         To have distinct writes, remember numWrites<=numReads in this case
                   ops[i] = new XactOp(ops[nextWrite++].getKey(),
-                          generateRandomString(sizeS), true);
+                                      generateRandomString(sizeS), true);
 
-                  while (nextWrite < total && rwB[nextWrite]) {       //while it is a put op, go on
+                  while (nextWrite < total && rwB[nextWrite]) {       //scan the bitmask up to the next read operation while it is a put op, go on
                      nextWrite++;
                   }
                }
@@ -78,7 +111,7 @@ public class SyntheticDistinctXactFactory_PreDaP extends SyntheticDistinctXactFa
 
    @Override
    protected SyntheticXact_PreDap generateXact(SyntheticXactParams p) {
-      return  new SyntheticXact_PreDap(p.getCache());
+      return new SyntheticXact_PreDap(p);
    }
 
 

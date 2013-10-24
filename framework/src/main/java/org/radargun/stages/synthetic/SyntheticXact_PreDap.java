@@ -1,6 +1,6 @@
 package org.radargun.stages.synthetic;
 
-import org.radargun.CacheWrapper;
+import java.util.Iterator;
 
 /**
  * // TODO: Document this
@@ -10,17 +10,12 @@ import org.radargun.CacheWrapper;
  */
 public class SyntheticXact_PreDap extends SyntheticXact {
 
-   public SyntheticXact_PreDap(CacheWrapper wrapper) {
-      super(wrapper);
+   public SyntheticXact_PreDap(SyntheticXactParams p) {
+      super(p);
    }
 
-   public void executeLocally() throws Exception {
-      for (XactOp op : ops) {
-         if (op.isPut())
-            cache.put(null, op.getKey(), op.getValue());
-         else
-            cache.get(null, op.getKey());
-      }
+   @Override
+   protected Iterator<XactOp> iterator() {
+      return new IteratorPreDap(this.ops);
    }
-
 }

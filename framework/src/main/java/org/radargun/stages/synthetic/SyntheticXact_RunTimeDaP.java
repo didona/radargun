@@ -2,9 +2,9 @@ package org.radargun.stages.synthetic;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.radargun.CacheWrapper;
 import org.radargun.stressors.KeyGenerator;
 
+import java.util.Iterator;
 import java.util.Random;
 
 /**
@@ -16,7 +16,7 @@ import java.util.Random;
 public class SyntheticXact_RunTimeDaP extends SyntheticXact {
 
    private int roRead, upRead, upWrite;
-   private SyntheticXactParams params;
+
    protected boolean[] RWB;
 
    private final static Log log = LogFactory.getLog(SyntheticXactFactory_RunTimeDaP.class);
@@ -24,8 +24,10 @@ public class SyntheticXact_RunTimeDaP extends SyntheticXact {
    //TODO: now this is ONLY for RR. The extension for GMU without blind writes has to be created.
    //TODO: this is not optimized for encounter time locking: reads and writes can happen at any place in the xact
 
-   public SyntheticXact_RunTimeDaP(CacheWrapper wrapper) {
-      super(wrapper);
+
+   public SyntheticXact_RunTimeDaP(SyntheticXactParams params) {
+      super(params);
+      this.params = params;
    }
 
    public void setParams(SyntheticXactParams params) {
@@ -36,6 +38,40 @@ public class SyntheticXact_RunTimeDaP extends SyntheticXact {
       this.RWB = RWB;
    }
 
+   @Override
+   protected Iterator<XactOp> iterator() {
+      if (getClazz().equals(xactClass.RO))
+         return new IteratorRuntimeDap_RO(params);
+      return new IteratorRuntimeDap_UP(params, RWB);
+   }
+
+
+
+   public int getRoRead() {
+      return roRead;
+   }
+
+   public void setRoRead(int roRead) {
+      this.roRead = roRead;
+   }
+
+   public int getUpRead() {
+      return upRead;
+   }
+
+   public void setUpRead(int upRead) {
+      this.upRead = upRead;
+   }
+
+   public int getUpWrite() {
+      return upWrite;
+   }
+
+   public void setUpWrite(int upWrite) {
+      this.upWrite = upWrite;
+   }
+
+   /*
    @Override
    public void executeLocally() throws Exception {
       if (getClazz().equals(xactClass.RO)) {
@@ -86,28 +122,5 @@ public class SyntheticXact_RunTimeDaP extends SyntheticXact {
       for (int i = 0; i < size / 2; i++) sb.append((char) (64 + params.getRandom().nextInt(26)));
       return sb.toString();
    }
-
-   public int getRoRead() {
-      return roRead;
-   }
-
-   public void setRoRead(int roRead) {
-      this.roRead = roRead;
-   }
-
-   public int getUpRead() {
-      return upRead;
-   }
-
-   public void setUpRead(int upRead) {
-      this.upRead = upRead;
-   }
-
-   public int getUpWrite() {
-      return upWrite;
-   }
-
-   public void setUpWrite(int upWrite) {
-      this.upWrite = upWrite;
-   }
+   */
 }

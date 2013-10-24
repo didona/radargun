@@ -10,7 +10,7 @@ import java.util.Arrays;
  */
 public abstract class SyntheticDistinctXactFactory <P extends SyntheticXactParams, S extends SyntheticXact> extends SyntheticXactFactory<P,S> {
 
-   protected boolean[] rwB;
+   protected final boolean[] rwB;
 
    public SyntheticDistinctXactFactory(P params) {
       super(params);
