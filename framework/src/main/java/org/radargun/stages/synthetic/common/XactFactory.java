@@ -1,4 +1,4 @@
-package org.radargun.stages.synthetic;
+package org.radargun.stages.synthetic.common;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

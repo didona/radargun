@@ -1,4 +1,4 @@
-package org.radargun.stages.synthetic;
+package org.radargun.stages.synthetic.common.synth;
 
 import java.util.Arrays;
 

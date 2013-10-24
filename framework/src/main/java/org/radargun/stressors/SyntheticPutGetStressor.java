@@ -21,13 +21,13 @@ package org.radargun.stressors;/*
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import org.radargun.stages.synthetic.SyntheticDistinctXactFactory_PreDaP;
-import org.radargun.stages.synthetic.SyntheticXact;
-import org.radargun.stages.synthetic.SyntheticXactFactory;
-import org.radargun.stages.synthetic.SyntheticXactFactory_RunTimeDaP;
-import org.radargun.stages.synthetic.SyntheticXactParams;
-import org.radargun.stages.synthetic.XACT_RETRY;
-import org.radargun.stages.synthetic.xactClass;
+import org.radargun.stages.synthetic.preDap.SyntheticDistinctXactFactory_PreDaP;
+import org.radargun.stages.synthetic.common.synth.SyntheticXact;
+import org.radargun.stages.synthetic.common.synth.SyntheticXactFactory;
+import org.radargun.stages.synthetic.runtimeDap.SyntheticXactFactory_RunTimeDaP;
+import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
+import org.radargun.stages.synthetic.common.XACT_RETRY;
+import org.radargun.stages.synthetic.common.xactClass;
 import org.radargun.utils.Utils;
 
 import java.lang.management.ManagementFactory;

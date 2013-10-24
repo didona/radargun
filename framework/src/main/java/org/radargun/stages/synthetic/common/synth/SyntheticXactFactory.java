@@ -1,6 +1,10 @@
-package org.radargun.stages.synthetic;
+package org.radargun.stages.synthetic.common.synth;
 
 import org.radargun.CacheWrapper;
+import org.radargun.stages.synthetic.common.XACT_RETRY;
+import org.radargun.stages.synthetic.common.XactFactory;
+import org.radargun.stages.synthetic.common.XactOp;
+import org.radargun.stages.synthetic.common.xactClass;
 import org.radargun.stressors.KeyGenerator;
 
 import java.util.Random;

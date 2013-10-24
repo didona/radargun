@@ -1,6 +1,7 @@
-package org.radargun.stages.synthetic;
+package org.radargun.stages.synthetic.common;
 
 import org.radargun.CacheWrapper;
+import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
 
 /**
  * // TODO: Document this

@@ -1,4 +1,7 @@
-package org.radargun.stages.synthetic;
+package org.radargun.stages.synthetic.common.synth;
+
+import org.radargun.stages.synthetic.common.Xact;
+import org.radargun.stages.synthetic.common.XactOp;
 
 import java.util.Arrays;
 import java.util.Iterator;

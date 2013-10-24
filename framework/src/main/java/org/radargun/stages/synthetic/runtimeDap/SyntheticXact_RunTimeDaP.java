@@ -1,11 +1,13 @@
-package org.radargun.stages.synthetic;
+package org.radargun.stages.synthetic.runtimeDap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.radargun.stressors.KeyGenerator;
+import org.radargun.stages.synthetic.common.synth.SyntheticXact;
+import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
+import org.radargun.stages.synthetic.common.XactOp;
+import org.radargun.stages.synthetic.common.xactClass;
 
 import java.util.Iterator;
-import java.util.Random;
 
 /**
  * // TODO: Document this

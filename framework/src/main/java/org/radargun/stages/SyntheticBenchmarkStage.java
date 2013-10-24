@@ -21,7 +21,7 @@ package org.radargun.stages;/*
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import org.radargun.stages.synthetic.XACT_RETRY;
+import org.radargun.stages.synthetic.common.XACT_RETRY;
 import org.radargun.stressors.SyntheticPutGetStressor;
 
 import java.util.Map;

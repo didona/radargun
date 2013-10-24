@@ -1,4 +1,8 @@
-package org.radargun.stages.synthetic;
+package org.radargun.stages.synthetic.preDap;
+
+import org.radargun.stages.synthetic.common.synth.SyntheticXact;
+import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
+import org.radargun.stages.synthetic.common.XactOp;
 
 import java.util.Iterator;
 

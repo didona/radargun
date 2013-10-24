@@ -1,4 +1,9 @@
-package org.radargun.stages.synthetic;
+package org.radargun.stages.synthetic.runtimeDap;
+
+import org.radargun.stages.synthetic.common.synth.SyntheticDistinctXactFactory;
+import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
+import org.radargun.stages.synthetic.common.XACT_RETRY;
+import org.radargun.stages.synthetic.common.XactOp;
 
 /**
  * // TODO: Document this

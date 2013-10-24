@@ -1,5 +1,7 @@
-package org.radargun.stages.synthetic;
+package org.radargun.stages.synthetic.runtimeDap;
 
+import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
+import org.radargun.stages.synthetic.common.XactOp;
 import org.radargun.stressors.KeyGenerator;
 
 import java.util.HashSet;
