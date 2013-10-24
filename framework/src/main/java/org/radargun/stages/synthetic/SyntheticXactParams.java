@@ -24,9 +24,18 @@ public class SyntheticXactParams extends XactParam {
    private CacheWrapper cache;
    private int readsBeforeFirstWrite;
    private boolean masterOnlyWrites;
+   private long spinBetweenOps;
 
    public boolean isMasterOnlyWrites() {
       return masterOnlyWrites;
+   }
+
+   public long getSpinBetweenOps() {
+      return spinBetweenOps;
+   }
+
+   public void setSpinBetweenOps(long spinBetweenOps) {
+      this.spinBetweenOps = spinBetweenOps;
    }
 
    public void setMasterOnlyWrites(boolean masterOnlyWrites) {

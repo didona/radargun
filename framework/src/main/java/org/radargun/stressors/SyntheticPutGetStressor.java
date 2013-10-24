@@ -57,6 +57,8 @@ public class SyntheticPutGetStressor extends PutGetStressor {
    private boolean precomputeRWset = false;
    private boolean sampleNTCBServiceTime = false;
 
+   private long spinBetweenOps = 0L;
+
 
    public int getReadsBeforeFirstWrite() {
       return readsBeforeFirstWrite;
@@ -132,6 +134,10 @@ public class SyntheticPutGetStressor extends PutGetStressor {
 
    public void setMasterOnlyWrites(boolean masterOnlyWrites) {
       this.masterOnlyWrites = masterOnlyWrites;
+   }
+
+   public void setSpinBetweenOps(long spinBetweenOps) {
+      this.spinBetweenOps = spinBetweenOps;
    }
 
    protected Map<String, String> processResults(List<Stressor> stressors) {
@@ -265,6 +271,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          params.setCache(cacheWrapper);
          params.setReadsBeforeFirstWrite(readsBeforeFirstWrite);
          params.setMasterOnlyWrites(masterOnlyWrites);
+         params.setSpinBetweenOps(spinBetweenOps);
          return params;
       }
 

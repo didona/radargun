@@ -13,6 +13,7 @@ import java.util.Arrays;
 public abstract class SyntheticXact extends Xact {
 
    protected XactOp[] ops;
+   protected long spinBetweenOps = 0L;
 
 
    public SyntheticXact(CacheWrapper wrapper) {
@@ -33,4 +34,6 @@ public abstract class SyntheticXact extends Xact {
             ", ops=" + Arrays.toString(ops) +
             '}';
    }
+
+
 }

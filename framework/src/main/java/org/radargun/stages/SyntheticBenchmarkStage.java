@@ -40,6 +40,7 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
    private boolean masterOnlyWrites = false;
    private boolean precomputeRWset = false;
    private boolean sampleNTCBServiceTime = false;
+   private long spinBetweenOps = 0L;
 
 
    protected Map<String, String> doWork() {
@@ -131,7 +132,11 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
    }
 
    public void setMasterOnlyWrites(String masterOnlyWrites) {
-      this.masterOnlyWrites =Boolean.valueOf(masterOnlyWrites);
+      this.masterOnlyWrites = Boolean.valueOf(masterOnlyWrites);
+   }
+
+   public void setSpinBetweenOps(long spinBetweenOps) {
+      this.spinBetweenOps = spinBetweenOps;
    }
 
    @Override
