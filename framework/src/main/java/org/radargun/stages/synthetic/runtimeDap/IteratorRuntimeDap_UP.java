@@ -44,6 +44,7 @@ public class IteratorRuntimeDap_UP implements Iterator<XactOp> {
       blindWriteAllowed = params.isAllowBlindWrites();
       sizeOfAttribute = params.getSizeOfValue();
       toDo = rwB.length;
+      keyGen = params.getKeyGenerator();
    }
 
    @Override
