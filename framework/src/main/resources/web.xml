@@ -5,7 +5,7 @@
    <benchmark initSize="1" maxSize="1" increment="1">
       <!--DestroyWrapper runOnAllSlaves="true"/-->
       <StartCluster ignorePutResult="true"  staggerSlaveStartup="true" delayAfterFirstSlaveStarts="5000" delayBetweenStartingSlaves = "500"/>
-      <ClusterValidation partialReplication="true"/>
+      <ClusterValidation partialReplication="false"/>
       <SyntheticWarmup keyGeneratorClass="org.radargun.stressors.ContentionStringKeyGenerator" numberOfAttributes="100000" sizeOfAnAttribute="1000" numOfThreads="2" transactionSize="100"/>
       <!--
          This will average to 10000 requests per thread, although a work-stealing pattern is used so some threads may
@@ -13,8 +13,8 @@
        -->
       <GarbageCollection/>
       <ResetStats/>
-      <SyntheticBenchmark sizeOfAnAttribute="1000" keyGeneratorClass="org.radargun.stressors.ContentionStringKeyGenerator" numberOfAttributes="100000" numOfThreads="1" updateXactWrites="10" updateXactReads="10" readOnlyXactSize="10" writePercentage="10" allowBlindWrites="false" duration="180000" retryMode="RETRY_SAME_CLASS" statsSamplingInterval="15000" readsBeforeFirstWrite="1"/>
-      <CsvReportGeneration/>
+	<SyntheticBenchmark sizeOfAnAttribute="1000" keyGeneratorClass="org.radargun.stressors.ContentionStringKeyGenerator" numberOfAttributes="200000" numOfThreads="1" updateXactWrites="5" updateXactReads="200" readOnlyXactSize="100" writePercentage="50" allowBlindWrites="false" duration="180000" retryMode="RETRY_SAME_CLASS" statsSamplingInterval="25000" readsBeforeFirstWrite="1" sampleNTCBServiceTime="true" precomputeRWset="false" masterOnlyWrites="true"/>      
+<CsvReportGeneration/>
    </benchmark>
 
    <products>

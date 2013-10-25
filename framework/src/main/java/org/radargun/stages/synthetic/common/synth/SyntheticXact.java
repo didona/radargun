@@ -53,7 +53,6 @@ public abstract class SyntheticXact extends Xact {
             cache.get(null, op.getKey());
          if (isSpin)
             doSpin(spin);
-
       }
    }
 

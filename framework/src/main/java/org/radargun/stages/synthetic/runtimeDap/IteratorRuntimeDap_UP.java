@@ -1,7 +1,7 @@
 package org.radargun.stages.synthetic.runtimeDap;
 
-import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
 import org.radargun.stages.synthetic.common.XactOp;
+import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
 import org.radargun.stressors.KeyGenerator;
 
 import java.util.HashSet;
@@ -31,6 +31,8 @@ public class IteratorRuntimeDap_UP implements Iterator<XactOp> {
    private boolean blindWriteAllowed = false;
    private int sizeOfAttribute;
    private int indexNextWrite = 0; //This points to the (i-1)-st read performed, in order to always write on distinct read items
+   private final int toDo;
+
 
    public IteratorRuntimeDap_UP(SyntheticXactParams params, boolean[] b) {
       this.params = params;
@@ -41,11 +43,12 @@ public class IteratorRuntimeDap_UP implements Iterator<XactOp> {
       rwB = b;
       blindWriteAllowed = params.isAllowBlindWrites();
       sizeOfAttribute = params.getSizeOfValue();
+      toDo = rwB.length;
    }
 
    @Override
    public boolean hasNext() {
-      return false;  // TODO: Customise this generated block
+      return currentOp < toDo;
    }
 
    @Override
@@ -72,10 +75,10 @@ public class IteratorRuntimeDap_UP implements Iterator<XactOp> {
          } else { //No blind writes: Take a value already read and increment         To have distinct writes, remember numWrites<=numReads in this case
             toRet = new XactOp(keyGen.generateKey(nodeIndex, threadIndex, readSet.get(indexNextWrite)),
                                generateRandomString(sizeOfAttribute), true);
-
             indexNextWrite++;
          }
       }
+      currentOp++;
       return toRet;
    }
 
