@@ -6,7 +6,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.infinispan.AdvancedCache;
 import org.infinispan.Cache;
-import org.infinispan.config.Configuration;
 import org.infinispan.context.Flag;
 import org.infinispan.distribution.DistributionManager;
 import org.infinispan.factories.ComponentRegistry;
@@ -22,7 +21,11 @@ import org.radargun.cachewrappers.parser.StatsParser;
 import org.radargun.utils.TypedProperties;
 import org.radargun.utils.Utils;
 
-import javax.management.*;
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
@@ -30,8 +33,15 @@ import javax.transaction.TransactionManager;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -326,7 +336,7 @@ public class InfinispanWrapper implements CacheWrapper {
 
    @Override
    public boolean isPassiveReplication() {
-       return cache.getCacheConfiguration().transaction().transactionProtocol() == TransactionProtocol.PASSIVE_REPLICATION;
+      return cache.getCacheConfiguration().transaction().transactionProtocol() == TransactionProtocol.PASSIVE_REPLICATION;
    }
 
    @Override
@@ -617,5 +627,25 @@ public class InfinispanWrapper implements CacheWrapper {
    @Override
    public boolean isCoordinator() {
       return transport.isCoordinator();
+   }
+
+   public void dumpHistograms() {
+      //Try to invoke it on all the components, though only one will actually reply
+      MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+      String domain = cacheManager.getGlobalConfiguration().getJmxDomain();
+      for (ObjectName component : mBeanServer.queryNames(null, null)) {
+         if (component.getDomain().equals(domain)) {
+            Object[] emptyArgs = new Object[0];
+            String[] emptySig = new String[0];
+            try {
+               log.trace("Try to dump hisograms" + component);
+               mBeanServer.invoke(component, "dumpHistograms", emptyArgs, emptySig);
+               log.warn("Histograms dumped on " + component);
+               return;
+            } catch (Exception e) {
+               log.debug("No histograms to dump in " + component);
+            }
+         }
+      }
    }
 }
