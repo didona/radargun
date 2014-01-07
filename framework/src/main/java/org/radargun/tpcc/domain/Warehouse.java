@@ -122,6 +122,10 @@ public class Warehouse extends AbstractDomainObject implements Serializable {
       return "WAREHOUSE_" + this.w_id;
    }
 
+   public boolean isLocalToNode(CacheWrapper wrapper){
+      return wrapper.isKeyLocal(getKey());
+   }
+
    @Override
    public void store(CacheWrapper wrapper) throws Throwable {
       wrapper.put(null, this.getKey(), this);

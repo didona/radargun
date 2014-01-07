@@ -19,13 +19,13 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class ThreadParallelTpccPopulation extends TpccPopulation {
 
-   private static Log log = LogFactory.getLog(ThreadParallelTpccPopulation.class);
+   protected static Log log = LogFactory.getLog(ThreadParallelTpccPopulation.class);
    private static final long MAX_SLEEP_BEFORE_RETRY = 30000; //30 seconds
 
    private int parallelThreads = 4;
-   private int elementsPerBlock = 100;  //items loaded per transaction
+   protected int elementsPerBlock = 100;  //items loaded per transaction
    private AtomicLong waitingPeriod;
-   private final ThreadTpccToolsManager threadTpccToolsManager;
+   protected final ThreadTpccToolsManager threadTpccToolsManager;
 
    public ThreadParallelTpccPopulation(CacheWrapper wrapper, int numWarehouses, int slaveIndex, int numSlaves,
                                        long cLastMask, long olIdMask, long cIdMask,
@@ -557,13 +557,25 @@ public class ThreadParallelTpccPopulation extends TpccPopulation {
                  ", customerId=" + customerId +
                  '}';
       }
+
+      public String getC_last() {
+         return c_last;
+      }
+
+      public int getWarehouseId() {
+         return warehouseId;
+      }
+
+      public int getDistrictId() {
+         return districtId;
+      }
    }
 
    protected final boolean isBatchingEnabled() {
       return this.elementsPerBlock != 1;
    }
 
-   private void startTransactionIfNeeded() {
+   protected void startTransactionIfNeeded() {
       if (isBatchingEnabled()) {
          //Pedro: this is experimental. I want to avoid the overloading of the network. 
          // So, instead of starting immediately the transaction, it waits a while
@@ -576,7 +588,7 @@ public class ThreadParallelTpccPopulation extends TpccPopulation {
       }
    }
 
-   private boolean endTransactionIfNeeded() {
+   protected boolean endTransactionIfNeeded() {
       if (!isBatchingEnabled()) {
          return true;
       }
@@ -631,23 +643,23 @@ public class ThreadParallelTpccPopulation extends TpccPopulation {
       }
    }
 
-   private void logStart(String thread) {
+   protected void logStart(String thread) {
       log.debug("Starting " + thread);
    }
 
-   private void logFinish(String thread) {
+   protected void logFinish(String thread) {
       log.debug("Ended " + thread);
    }
 
-   private void logBatch(String thread, long batch, long numberOfBatches) {
+   protected void logBatch(String thread, long batch, long numberOfBatches) {
       log.debug(thread + " is populating the " + batch + " batch out of " + numberOfBatches);
    }
 
-   private void logRemainder(String thread) {
+   protected void logRemainder(String thread) {
       log.debug(thread + " is populating the remainder");
    }
 
-   private void logCustomerLookupPopulation(long init, long end) {
+   protected void logCustomerLookupPopulation(long init, long end) {
       log.debug("Populate Customer Lookup from index " + init + " to " + end);
    }
 

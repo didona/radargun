@@ -4,10 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
 import org.radargun.stages.TpccPopulationStage;
-import org.radargun.tpcc.PassiveReplicationTpccPopulation;
-import org.radargun.tpcc.ThreadParallelTpccPopulation;
-import org.radargun.tpcc.TpccPopulation;
-import org.radargun.tpcc.TpccTools;
+import org.radargun.tpcc.*;
 
 import java.util.Map;
 
@@ -37,6 +34,7 @@ public class TpccPopulationStressor extends AbstractCacheWrapperStressor {
 
    //For thread-grain parallel warmup
    private boolean threadParallelLoad = false;
+   private boolean deterministicLoad = false;
 
    private int numLoadersThread = 4;
 
@@ -77,6 +75,11 @@ public class TpccPopulationStressor extends AbstractCacheWrapperStressor {
          tpccPopulation = new ThreadParallelTpccPopulation(wrapper, this.numWarehouses, this.slaveIndex,
                  this.numSlaves, this.cLastMask, this.olIdMask,
                  this.cIdMask, this.numLoadersThread, this.batchLevel);
+      } else if (this.deterministicLoad) {
+         log.info("Performing DETERMINISTIC thread-parallel population...");
+         tpccPopulation = new DeterministicThreadParallelTpccPopulation(wrapper, this.numWarehouses, this.slaveIndex,
+                 this.numSlaves, this.cLastMask, this.olIdMask,
+                 this.cIdMask, this.batchLevel);
       } else {
          log.info("Performing population...");
          tpccPopulation = new TpccPopulation(wrapper, this.numWarehouses, this.slaveIndex, this.numSlaves,
@@ -195,5 +198,9 @@ public class TpccPopulationStressor extends AbstractCacheWrapperStressor {
 
    public void setOneWarmup(boolean oneWarmup) {
       this.oneWarmup = oneWarmup;
+   }
+
+   public void setDeterministicLoad(boolean deterministicLoad) {
+      this.deterministicLoad = deterministicLoad;
    }
 }

@@ -43,6 +43,8 @@ public interface CacheWrapper {
 
    void putIfLocal(String bucket, Object key, Object value) throws Exception;
 
+   boolean isKeyLocal(Object key);
+
    /**
     * @see #put(String, Object, Object)
     */

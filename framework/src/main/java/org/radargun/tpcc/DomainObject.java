@@ -44,4 +44,7 @@ public interface DomainObject {
     * @throws Throwable if something wrong occurs
     */
    boolean load(CacheWrapper wrapper) throws Throwable;
+
+
+
 }

@@ -83,7 +83,7 @@ public class TpccPopulation {
       populateItem();
 
       populateWarehouses();
-      log.info("Here avoiding gc after population");
+      log.info("Avoiding gc after population, as it can give kind of failure detectors problems");
       /*
       printMemoryFootprint(true);
       System.gc();
@@ -365,7 +365,7 @@ public class TpccPopulation {
       txAwarePut(createNewOrder(orderId, districtId, warehouseId));
    }
 
-   protected final boolean txAwarePut(DomainObject domainObject) {
+   protected boolean txAwarePut(DomainObject domainObject) {
       if (wrapper.isInTransaction()) {
          try {
             domainObject.storeToPopulate(wrapper, slaveIndex, populateLocalOnly);
@@ -465,7 +465,7 @@ public class TpccPopulation {
               ". Error is " + throwable.getLocalizedMessage() + ". Retrying...", throwable);
    }
 
-   protected final Warehouse createWarehouse(int warehouseId) {
+   protected Warehouse createWarehouse(int warehouseId) {
       return new Warehouse(warehouseId,
               tpccTools.get().aleaChainec(6, 10),
               tpccTools.get().aleaChainec(10, 20),
@@ -477,7 +477,7 @@ public class TpccPopulation {
               TpccTools.WAREHOUSE_YTD);
    }
 
-   protected final Item createItem(long itemId) {
+   protected Item createItem(long itemId) {
       return new Item(itemId,
               tpccTools.get().aleaNumber(1, 10000),
               tpccTools.get().aleaChainec(14, 24),
@@ -485,7 +485,7 @@ public class TpccPopulation {
               tpccTools.get().sData());
    }
 
-   protected final Stock createStock(long stockId, int warehouseId) {
+   protected Stock createStock(long stockId, int warehouseId) {
       return new Stock(stockId,
               warehouseId,
               tpccTools.get().aleaNumber(10, 100),
@@ -505,7 +505,7 @@ public class TpccPopulation {
               tpccTools.get().sData());
    }
 
-   protected final District createDistrict(int districtId, int warehouseId) {
+   protected District createDistrict(int districtId, int warehouseId) {
       return new District(warehouseId,
               districtId,
               tpccTools.get().aleaChainec(6, 10),
@@ -519,7 +519,7 @@ public class TpccPopulation {
               3001);
    }
 
-   protected final Customer createCustomer(int warehouseId, long districtId, long customerId, String customerLastName) {
+   protected Customer createCustomer(int warehouseId, long districtId, long customerId, String customerLastName) {
       return new Customer(warehouseId,
               districtId,
               customerId,
@@ -552,8 +552,8 @@ public class TpccPopulation {
               new Date(System.currentTimeMillis()), 10, tpccTools.get().aleaChainec(12, 24));
    }
 
-   protected final Order createOrder(long orderId, long districtId, long warehouseId, Date aDate, int o_ol_cnt,
-                                     int seqAlea) {
+   protected Order createOrder(long orderId, long districtId, long warehouseId, Date aDate, int o_ol_cnt,
+                               int seqAlea) {
       return new Order(orderId,
               districtId,
               warehouseId,
