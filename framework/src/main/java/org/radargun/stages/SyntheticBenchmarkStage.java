@@ -42,10 +42,11 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
    private boolean sampleNTCBServiceTime = false;
    private long spinBetweenOps = 0L;
 
+   protected SyntheticPutGetStressor buildPutGetStressor() {
+      return new SyntheticPutGetStressor();
+   }
 
-   protected Map<String, String> doWork() {
-      log.info("Starting " + getClass().getSimpleName() + ": " + this);
-      SyntheticPutGetStressor putGetStressor = new SyntheticPutGetStressor();
+   protected void initPutGetStressor(SyntheticPutGetStressor putGetStressor) {
       putGetStressor.setNodeIndex(getSlaveIndex());
       putGetStressor.setNumberOfAttributes(numberOfAttributes);
       putGetStressor.setNumOfThreads(numOfThreads);
@@ -66,6 +67,13 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
       putGetStressor.setMasterOnlyWrites(masterOnlyWrites);
       putGetStressor.setSampleNTCBServiceTime(sampleNTCBServiceTime);
       putGetStressor.setPrecomputeRWset(precomputeRWset);
+   }
+
+   protected Map<String, String> doWork() {
+      log.info("Starting " + getClass().getSimpleName() + ": " + this);
+      SyntheticPutGetStressor putGetStressor = buildPutGetStressor();
+      initPutGetStressor(putGetStressor);
+
       return putGetStressor.stress(cacheWrapper);
    }
 
@@ -84,7 +92,6 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
    public int getUpdateXactWrites() {
       return updateXactWrites;
    }
-
 
    public boolean isAllowBlindWrites() {
       return allowBlindWrites;
@@ -142,9 +149,9 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
    @Override
    public String toString() {
       return "SyntheticBenchmarkStage{" +
-            "updateXactWrites=" + updateXactWrites +
-            ", readOnlyXactSize=" + readOnlyXactSize +
-            ", updateXactReads=" + updateXactReads +
-            '}';
+              "updateXactWrites=" + updateXactWrites +
+              ", readOnlyXactSize=" + readOnlyXactSize +
+              ", updateXactReads=" + updateXactReads +
+              '}';
    }
 }

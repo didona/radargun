@@ -29,7 +29,7 @@ public abstract class SyntheticDistinctXactFactory <P extends SyntheticXactParam
       boolean[] rwB = new boolean[total];
       String msgExc = null;
       int fW = params.getReadsBeforeFirstWrite();
-      if (fW > numReads)
+      if (fW > numReads && !params.isAllowBlindWrites())
          msgExc = ("NumReadsBeforeFirstWrite > numReads!");
       if (numReads < numWrites && !params.isAllowBlindWrites())
          msgExc = "NumWrites has to be greater than numReads to avoid blindWrites and have no duplicates";

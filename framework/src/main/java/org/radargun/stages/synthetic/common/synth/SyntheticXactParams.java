@@ -22,11 +22,28 @@ public class SyntheticXactParams extends XactParam {
    private int UpPuts;
    private int UpReads;
    private KeyGenerator keyGenerator;
-   private int nodeIndex, threadIndex, numKeys, sizeOfValue, writePercentage;
+   private int nodeIndex, threadIndex, numKeys, sizeOfValue, writePercentage,numNodes;
    private CacheWrapper cache;
    private int readsBeforeFirstWrite;
    private boolean masterOnlyWrites;
    private long spinBetweenOps;
+   private int numRemoteNodesToContact = 0;
+
+   public int getNumRemoteNodesToContact() {
+      return numRemoteNodesToContact;
+   }
+
+   public int getNumNodes() {
+      return numNodes;
+   }
+
+   public void setNumNodes(int numNodes) {
+      this.numNodes = numNodes;
+   }
+
+   public void setNumRemoteNodesToContact(int numRemoteNodesToContact) {
+      this.numRemoteNodesToContact = numRemoteNodesToContact;
+   }
 
    public boolean isMasterOnlyWrites() {
       return masterOnlyWrites;

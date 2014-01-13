@@ -13,8 +13,9 @@ import org.radargun.stages.synthetic.common.XactOp;
  */
 public class SyntheticXactFactory_RunTimeDaP extends SyntheticDistinctXactFactory<SyntheticXactParams, SyntheticXact_RunTimeDaP> {
 
-   private int roRead, upRead, upWrite;
-
+   protected int roRead;
+   protected int upRead;
+   protected int upWrite;
 
    public SyntheticXactFactory_RunTimeDaP(SyntheticXactParams params) {
       super(params);
@@ -42,12 +43,12 @@ public class SyntheticXactFactory_RunTimeDaP extends SyntheticDistinctXactFactor
    }
 
    @Override
-   protected XactOp[] buildReadSet() {
+   protected final XactOp[] buildReadSet() {
       return null;
    }
 
    @Override
-   protected XactOp[] buildReadWriteSet() {
+   protected final XactOp[] buildReadWriteSet() {
       return null;
    }
 }

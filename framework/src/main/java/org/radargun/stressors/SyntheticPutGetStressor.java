@@ -21,23 +21,18 @@ package org.radargun.stressors;/*
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import org.radargun.stages.synthetic.preDap.SyntheticDistinctXactFactory_PreDaP;
+import org.radargun.stages.synthetic.common.XACT_RETRY;
 import org.radargun.stages.synthetic.common.synth.SyntheticXact;
 import org.radargun.stages.synthetic.common.synth.SyntheticXactFactory;
-import org.radargun.stages.synthetic.runtimeDap.SyntheticXactFactory_RunTimeDaP;
 import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
-import org.radargun.stages.synthetic.common.XACT_RETRY;
 import org.radargun.stages.synthetic.common.xactClass;
+import org.radargun.stages.synthetic.preDap.SyntheticDistinctXactFactory_PreDaP;
+import org.radargun.stages.synthetic.runtimeDap.SyntheticXactFactory_RunTimeDaP;
 import org.radargun.utils.Utils;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -48,7 +43,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
    private int updateXactWrites = 1;
    private int updateXactReads = 1;
    private boolean allowBlindWrites = false;
-   private long startTime;
+   protected long startTime;
    private XACT_RETRY xact_retry;
    private int readsBeforeFirstWrite = 1;
    private boolean masterOnlyWrites = false;
@@ -215,7 +210,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       return stressors;
    }
 
-   private class SyntheticStressor extends Stressor {
+   protected class SyntheticStressor extends Stressor {
 
 
       private KeyGenerator perThreadKeyGen;
@@ -234,13 +229,17 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          this.nodeIndex = nodeIndex;
          this.threadIndex = threadIndex;
          this.numKeys = numKeys;
+         initFactory();
+         if (traceE) {
+            log.trace("Xact factory built " + factory.toString());
+         }
+      }
+
+      protected void initFactory() {
          if (precomputeRWset) {
             this.factory = new SyntheticDistinctXactFactory_PreDaP(buildParams());
          } else {
             this.factory = new SyntheticXactFactory_RunTimeDaP(buildParams());
-         }
-         if (traceE) {
-            log.trace("Xact factory built " + factory.toString());
          }
       }
 
@@ -254,7 +253,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       }
 
 
-      private SyntheticXactParams buildParams() {
+      protected SyntheticXactParams buildParams() {
          SyntheticXactParams params = new SyntheticXactParams();
          params.setRandom(r);
          params.setKeyGenerator(perThreadKeyGen);

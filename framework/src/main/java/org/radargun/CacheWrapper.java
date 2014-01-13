@@ -1,8 +1,10 @@
 package org.radargun;
 
 
+import org.infinispan.remoting.transport.Address;
 import org.radargun.utils.TypedProperties;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -150,5 +152,9 @@ public interface CacheWrapper {
    void setIgnorePutResult(boolean b);
 
    void dumpHistograms();
+
+   public List<Address> members();
+
+   public void  initHashIfNecessary();
 
 }

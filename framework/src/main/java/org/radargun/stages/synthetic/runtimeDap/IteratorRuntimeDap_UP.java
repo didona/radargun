@@ -18,19 +18,19 @@ import java.util.Set;
  */
 public class IteratorRuntimeDap_UP implements Iterator<XactOp> {
 
-   private LinkedList<Integer> readSet = new LinkedList<Integer>();
-   private Set<Integer> writeSet = new HashSet<Integer>();
-   private SyntheticXactParams params;
-   private boolean[] rwB;
-   int currentOp = 0;
-   private KeyGenerator keyGen;
-   private Random r;
-   private int numKeys;
-   private int nodeIndex;
-   private int threadIndex;
-   private boolean blindWriteAllowed = false;
-   private int sizeOfAttribute;
-   private int indexNextWrite = 0; //This points to the (i-1)-st read performed, in order to always write on distinct read items
+   protected LinkedList<Integer> readSet = new LinkedList<Integer>();
+   protected Set<Integer> writeSet = new HashSet<Integer>();
+   protected SyntheticXactParams params;
+   protected boolean[] rwB;
+   protected int currentOp = 0;
+   protected KeyGenerator keyGen;
+   protected Random r;
+   protected int numKeys;
+   protected int nodeIndex;
+   protected int threadIndex;
+   protected boolean blindWriteAllowed = false;
+   protected int sizeOfAttribute;
+   protected int indexNextWrite = 0; //This points to the (i-1)-st read performed, in order to always write on distinct read items
    private final int toDo;
 
 

@@ -8,6 +8,7 @@ import org.infinispan.AdvancedCache;
 import org.infinispan.Cache;
 import org.infinispan.context.Flag;
 import org.infinispan.distribution.DistributionManager;
+import org.infinispan.distribution.ch.ConsistentHash;
 import org.infinispan.factories.ComponentRegistry;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.remoting.rpc.RpcManager;
@@ -121,7 +122,7 @@ public class InfinispanWrapper implements CacheWrapper {
       }
    }
 
-
+   @Override
    public List<Address> members() {
       return cache.getAdvancedCache().getRpcManager().getTransport().getMembers();
    }
@@ -255,40 +256,50 @@ public class InfinispanWrapper implements CacheWrapper {
          throw new RuntimeException("Caches haven't discovered and joined the cluster even after " + Utils.prettyPrintMillis(gracePeriod));
    }
 
-   /*
-   private void injectEvenConsistentHash(TypedProperties confAttributes) {
-
-      if (cache.getConfiguration().getCacheMode().isDistributed()) {
-         ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
-         if (ch instanceof EvenSpreadingConsistentHash) {
-            int threadsPerNode = confAttributes.getIntProperty("threadsPerNode", -1);
-            if (threadsPerNode < 0)
-               throw new IllegalStateException("When EvenSpreadingConsistentHash is used threadsPerNode must also be set.");
-            int keysPerThread = confAttributes.getIntProperty("keysPerThread", -1);
-            if (keysPerThread < 0)
-               throw new IllegalStateException("When EvenSpreadingConsistentHash is used must also be set.");
-            ((EvenSpreadingConsistentHash) ch).init(threadsPerNode, keysPerThread);
-            log.info("Using an even consistent hash!");
-         }
-
-      }
+   @Override
+   public void initHashIfNecessary() {
+      ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
+      if (ch instanceof TestPrepareSingleOwnerContendedStringHash) {
+         ((TestPrepareSingleOwnerContendedStringHash) ch).onAllMembersJoin(cacheManager.getMembers());
+         log.fatal("TestPrepareConsistentHash initialized with members " + cacheManager.getMembers());
+      } else
+         log.fatal("Current consistent hash " + ch);
    }
 
+   /*
+      private void injectEvenConsistentHash(TypedProperties confAttributes) {
 
-    private void injectEvenConsistentHash(TypedProperties confAttributes) {
-        if(cache.getCacheConfiguration().clustering().cacheMode().isDistributed()){
+         if (cache.getConfiguration().getCacheMode().isDistributed()) {
             ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
-            if (ch instanceof UniformContendedStringHash) {
-                log.warn("Starting my hash");
-                ch.setCaches(new HashSet(this.members()));
-            }
-            else{
-                log.warn("ConsistentHash of class "+ch);
+            if (ch instanceof EvenSpreadingConsistentHash) {
+               int threadsPerNode = confAttributes.getIntProperty("threadsPerNode", -1);
+               if (threadsPerNode < 0)
+                  throw new IllegalStateException("When EvenSpreadingConsistentHash is used threadsPerNode must also be set.");
+               int keysPerThread = confAttributes.getIntProperty("keysPerThread", -1);
+               if (keysPerThread < 0)
+                  throw new IllegalStateException("When EvenSpreadingConsistentHash is used must also be set.");
+               ((EvenSpreadingConsistentHash) ch).init(threadsPerNode, keysPerThread);
+               log.info("Using an even consistent hash!");
             }
 
-        }
-    }
-   */
+         }
+      }
+
+
+       private void injectEvenConsistentHash(TypedProperties confAttributes) {
+           if(cache.getCacheConfiguration().clustering().cacheMode().isDistributed()){
+               ConsistentHash ch = cache.getAdvancedCache().getDistributionManager().getConsistentHash();
+               if (ch instanceof UniformContendedStringHash) {
+                   log.warn("Starting my hash");
+                   ch.setCaches(new HashSet(this.members()));
+               }
+               else{
+                   log.warn("ConsistentHash of class "+ch);
+               }
+
+           }
+       }
+      */
    private void assertTm() {
       if (tm == null) throw new RuntimeException("No configured TM!");
    }

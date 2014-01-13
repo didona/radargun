@@ -11,6 +11,7 @@ import java.util.*;
  * @author Diego Didona  - didona@gsd.inesc-id.pt
  *         Since 10/04/13
  */
+@Deprecated
 public class UniformContendedStringHash implements ConsistentHash {
 
     private Address[] caches;
