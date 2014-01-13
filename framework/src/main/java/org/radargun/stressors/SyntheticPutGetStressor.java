@@ -273,7 +273,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          return params;
       }
 
-      private void runInternal() {
+      protected void runInternal() {
          result outcome;
          SyntheticXact last = null;
          try {

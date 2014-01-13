@@ -40,7 +40,6 @@ public class TestPrepareContentionStringKeyGenerator extends ContentionStringKey
 
    @Override
    public Object generateKey(int nodeIndex, int threadIndex, int keyIndex) {
-
       int actualKey = keysPerNode * keyIndex + nodeIndex;
       return super.generateKey(CONTEND, CONTEND, actualKey);
    }

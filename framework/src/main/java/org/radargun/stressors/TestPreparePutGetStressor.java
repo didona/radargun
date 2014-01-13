@@ -17,9 +17,14 @@ import java.util.concurrent.CountDownLatch;
 public class TestPreparePutGetStressor extends SyntheticPutGetStressor {
 
    private int numRemoteNodeToContact;
+   private boolean onlyOneWriter;
 
    public void setNumRemoteNodeToContact(int numRemoteNodeToContact) {
       this.numRemoteNodeToContact = numRemoteNodeToContact;
+   }
+
+   public void setOnlyOneWriter(boolean onlyOneWriter) {
+      this.onlyOneWriter = onlyOneWriter;
    }
 
    @Override
@@ -50,6 +55,12 @@ public class TestPreparePutGetStressor extends SyntheticPutGetStressor {
          this.perThreadKeyGen = new TestPrepareContentionStringKeyGenerator(cacheWrapper.getNumMembers(), numKeys);
          if (log.isTraceEnabled())
             log.trace(perThreadKeyGen);
+      }
+
+      protected void runInternal() {
+         if (onlyOneWriter && !cacheWrapper.isCoordinator())
+            return;
+         super.runInternal();
       }
 
       protected void initFactory() {
