@@ -1,5 +1,9 @@
 package org.radargun.stressors;
 
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * // TODO: Document this
  *
@@ -15,13 +19,19 @@ package org.radargun.stressors;
 public class TestPrepareContentionStringKeyGenerator extends ContentionStringKeyGenerator {
 
    private int keysPerNode;
+   private final static Log log = LogFactory.getLog(TestPrepareContentionStringKeyGenerator.class);
+   private final static boolean trace = log.isTraceEnabled();
 
    public TestPrepareContentionStringKeyGenerator(int numNodes, int numKeys) {
       int remainder = numKeys % numNodes;
       int actualKeys = numKeys - remainder;
       this.keysPerNode = (int) ((double) actualKeys / (double) numNodes);
+      if (trace)
+         log.trace(this);
    }
 
+   public TestPrepareContentionStringKeyGenerator() {
+   }
 
    @Override
    public Object generateKey(int threadIndex, int keyIndex) {
@@ -30,6 +40,7 @@ public class TestPrepareContentionStringKeyGenerator extends ContentionStringKey
 
    @Override
    public Object generateKey(int nodeIndex, int threadIndex, int keyIndex) {
+
       int actualKey = keysPerNode * keyIndex + nodeIndex;
       return super.generateKey(CONTEND, CONTEND, actualKey);
    }
@@ -39,4 +50,10 @@ public class TestPrepareContentionStringKeyGenerator extends ContentionStringKey
       return Integer.parseInt(split[split.length - 1]);
    }
 
+   @Override
+   public String toString() {
+      return "TestPrepareContentionStringKeyGenerator{" +
+              "keysPerNode=" + keysPerNode +
+              '}';
+   }
 }

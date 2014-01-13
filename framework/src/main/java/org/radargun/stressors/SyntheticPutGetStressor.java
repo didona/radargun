@@ -196,7 +196,8 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       startPoint = new CountDownLatch(1);
       startTime = System.nanoTime();
       for (int threadIndex = 0; threadIndex < numOfThreads; threadIndex++) {
-         Stressor stressor = new SyntheticStressor(threadIndex, (KeyGenerator) Utils.instantiate(this.getKeyGeneratorClass()), nodeIndex, numberOfKeys);
+         SyntheticStressor stressor = new SyntheticStressor(threadIndex, (KeyGenerator) Utils.instantiate(this.getKeyGeneratorClass()), nodeIndex, numberOfKeys);
+         stressor.initFactory();
          stressors.add(stressor);
          stressor.start();
       }
@@ -213,7 +214,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
    protected class SyntheticStressor extends Stressor {
 
 
-      private KeyGenerator perThreadKeyGen;
+      protected KeyGenerator perThreadKeyGen;
       private int nodeIndex, threadIndex, numKeys;
       private long writes, reads, localAborts, remoteAborts;
       private long writeSuxExecutionTime = 0, readOnlySuxExecutionTime = 0, initTime = 0, commitTime = 0, writeResponseTime = 0;
@@ -229,10 +230,6 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          this.nodeIndex = nodeIndex;
          this.threadIndex = threadIndex;
          this.numKeys = numKeys;
-         initFactory();
-         if (traceE) {
-            log.trace("Xact factory built " + factory.toString());
-         }
       }
 
       protected void initFactory() {
@@ -241,6 +238,8 @@ public class SyntheticPutGetStressor extends PutGetStressor {
          } else {
             this.factory = new SyntheticXactFactory_RunTimeDaP(buildParams());
          }
+         if (traceE)
+            log.trace("Factory " + factory);
       }
 
       @Override

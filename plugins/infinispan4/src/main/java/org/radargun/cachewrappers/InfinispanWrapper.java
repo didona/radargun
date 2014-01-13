@@ -122,10 +122,6 @@ public class InfinispanWrapper implements CacheWrapper {
       }
    }
 
-   @Override
-   public List<Address> members() {
-      return cache.getAdvancedCache().getRpcManager().getTransport().getMembers();
-   }
 
    public void put(String bucket, Object key, Object value) throws Exception {
 

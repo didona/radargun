@@ -35,12 +35,15 @@ public class IteratorRunTimeDapControlledRemoteNodes_UP extends IteratorRuntimeD
       if (!blindWriteAllowed && params.getUpReads() < params.getNumRemoteNodesToContact()) {
          throw new IllegalArgumentException("With NO blind writes you must have numReads per update xact >= remoteNodesToContact");
       }
+      if (trace)
+         log.trace(this);
    }
 
    private int[] remoteNodesToAccess;
-   private int nextRemoteNodeToAccess;
+   private int nextRemoteNodeToAccess = 0;
    private HashMap<Integer, Integer> keyToNode = new HashMap<Integer, Integer>();
    private final static Log log = LogFactory.getLog(IteratorRunTimeDapControlledRemoteNodes_UP.class);
+   private final static boolean trace = log.isTraceEnabled();
 
    /**
     * Populate the list of remote nodes to contact
@@ -53,7 +56,7 @@ public class IteratorRunTimeDapControlledRemoteNodes_UP extends IteratorRuntimeD
       for (int i = 0; i < nodesToContact; i++) {
          remoteNodesToAccess[i] = uniformRandomRemoteNode(i);
       }
-      if (log.isTraceEnabled())
+      if (trace)
          log.trace("Remote nodes I'll contact are " + Arrays.toString(remoteNodesToAccess));
    }
 
@@ -94,6 +97,7 @@ public class IteratorRunTimeDapControlledRemoteNodes_UP extends IteratorRuntimeD
    public XactOp next() {
       XactOp toRet;
       int key;
+      Object keyV;
       /*
       If I read it means I am in no-blindwrite mode, so I read a new key from the current remote node and increment
        */
@@ -104,9 +108,13 @@ public class IteratorRunTimeDapControlledRemoteNodes_UP extends IteratorRuntimeD
          while (readSet.contains(key));  //avoid repetitions: for simplicity, I do not use twice a key with the same id, regardless of the node!
          readSet.addLast(key);
          keyToNode.put(key, nextRemoteNodeToAccess);
-         toRet = new XactOp(keyGen.generateKey(nextRemoteNodeToAccess, threadIndex, key),
-                 null, false);    //add a read
-         nextRemoteNodeToAccess = (nextRemoteNodeToAccess++) % remoteNodesToAccess.length;
+         keyV = keyGen.generateKey(remoteNodesToAccess[nextRemoteNodeToAccess], threadIndex, key);
+         toRet = new XactOp(keyV, null, false);    //add a read
+         if (trace)
+            log.trace("Going to read " + keyV + " from node " + remoteNodesToAccess[nextRemoteNodeToAccess]);
+         nextRemoteNodeToAccess++;
+         nextRemoteNodeToAccess = (nextRemoteNodeToAccess) % remoteNodesToAccess.length;
+
       } else {    //Put
          /*
          If I have blind writes, I *only* have blind writes, thus I write a key from the current remote node
@@ -114,12 +122,19 @@ public class IteratorRunTimeDapControlledRemoteNodes_UP extends IteratorRuntimeD
          if (blindWriteAllowed) {        //You can *only* have (distinct) blind writes
             do {
                key = r.nextInt(numKeys);
+               if(trace)
+                  log.trace("Drawn key "+key);
             }
             while (writeSet.contains(key));  //avoid repetitions among writes. For simplicity, use only once a key, regardless of the node contacted
+            log.trace("Final key "+key);
             writeSet.add(key);
-            toRet = new XactOp(keyGen.generateKey(nextRemoteNodeToAccess, threadIndex, key),
+            keyV = keyGen.generateKey(remoteNodesToAccess[nextRemoteNodeToAccess], threadIndex, key);
+            toRet = new XactOp(keyV,
                     generateRandomString(sizeOfAttribute), true);    //add a write op
-            nextRemoteNodeToAccess = (nextRemoteNodeToAccess++) % remoteNodesToAccess.length;
+            if (trace)
+               log.trace("Going to blindly write " + keyV + " of node " + remoteNodesToAccess[nextRemoteNodeToAccess]);
+            nextRemoteNodeToAccess++;
+            nextRemoteNodeToAccess = (nextRemoteNodeToAccess) % remoteNodesToAccess.length;
          }
          /*
          If I do not have blind writes, I read from a key already read
@@ -127,8 +142,11 @@ public class IteratorRunTimeDapControlledRemoteNodes_UP extends IteratorRuntimeD
          else { //No blind writes: Take a value already read and increment         To have distinct writes, remember numWrites<=numReads in this case
             int keyToUse = readSet.get(indexNextWrite);
             int remoteNodeIndex = keyToNode.get(keyToUse);
-            toRet = new XactOp(keyGen.generateKey(remoteNodeIndex, threadIndex, keyToUse),
+            keyV = keyGen.generateKey(remoteNodeIndex, threadIndex, keyToUse);
+            toRet = new XactOp(keyV,
                     generateRandomString(sizeOfAttribute), true);
+            if (trace)
+               log.trace("Going to write already read  " + keyV + " of node " + keyToNode.get(keyToUse));
             indexNextWrite++;
          }
       }

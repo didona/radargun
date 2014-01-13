@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<!-- The Log4j Configuration -->
+<!-- $Id: log4j.xml,v 1.10 2007/05/18 14:32:09 msurtani Exp $ -->
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <!-- The list of appenders -->
+    <!-- The rolling file appender -->
+    <appender name="FILE" class="org.radargun.utils.PerNodeRollingFileAppender">
+        <param name="File" value="radargun.log"/>
+        <param name="Append" value="false"/>
+        <param name="Threshold" value="TRACE"/>
+        <param name="MaxFileSize" value="100MB"/>
+        <param name="MaxBackupIndex" value="3"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <!-- The default pattern: Date Priority [Category] Message\n -->
+            <param name="ConversionPattern" value="%d [%t] %-5p [%c] %m%n"/>
+            <!--param name="ConversionPattern" valye="%p %t %c - %m%n"/-->
+        </layout>
+    </appender>
+
+    <!-- The console appender -->
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <param name="Threshold" value="TRACE"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
+        </layout>
+    </appender>
+
+
+    <!-- The list of Categories-->
+    <category name="org.infinispan.CacheException">
+        <priority value="TRACE"/>
+    </category>
+
+    <category name="org.radargun.stages.ClusterValidationStage">
+        <priority value="TRACE"/>
+    </category>
+    <category name="org.radargun.stages.StartClusterStage">
+        <priority value="TRACE"/>
+    </category>
+<category name="org.radargun.stages.SyntheticStage">
+        <priority value="TRACE"/>
+    </category>
+	
+    <category name="org.radargun">
+        <priority value="INFO"/>
+    </category>
+    <category name="org.radargun.stressors">
+	<priority value="TRACE"/>
+   </category>
+
+    <category name="org.radargun.reporting">
+        <priority value="TRACE"/>
+    </category>
+
+   <category name="org.radargun">
+	<priority value="TRACE"/>
+   </category>
+  <category name="org.radargun.tpcc.TpccPopulation">
+	<priority value="INFO"/>
+  </category>
+    <category name="org.jgroups">
+        <priority value="OFF"/>
+    </category>
+
+
+    <category name="org.infinispan">
+        <priority value="OFF"/>
+    </category>
+
+   <category name="org.infinispan.remoting.transport.jgroups.CommandAwareRpcDispatcher">
+	<priority value="OFF"/>
+    </category>
+
+  <category name="org.infinispan.remoting.InboundInvocationHandlerImpl">
+   	<priority value="OFF"/>
+  </category>
+
+  <category name="org.infinispan.util.concurrent.BlockingTaskAwareExecutorServiceImpl">
+	<priority value="OFF"/>
+   </category>
+ 
+<category name="org.infinispan.transaction.gmu.CommitLog">
+        <priority value="OFF"/>
+   </category>
+  
+  <category name="org.radargun.cachewrappers.InfinispanWrapper">
+	<priority value="OFF"/>
+   </category>
+<category name="org.radargun.tpcc.domain">
+	<priority value="TRACE"/>
+</category> 
+   <!-- Here goes the root -->
+    <root>
+        <priority value="TRACE"/>
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</log4j:configuration>

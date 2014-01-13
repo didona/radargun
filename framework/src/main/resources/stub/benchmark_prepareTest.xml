@@ -1,0 +1,34 @@
+<bench-config>
+
+   <master bindAddress="${127.0.0.1:master.address}" port="${2103:master.port}"/>
+
+   <benchmark initSize="INITS" maxSize="MAXS" increment="INCS">
+      <!--DestroyWrapper runOnAllSlaves="true"/-->
+      <StartCluster ignorePutResult="true" staggerSlaveStartup="true" delayAfterFirstSlaveStarts="5000" delayBetweenStartingSlaves = "1000"/>
+      <ClusterValidation partialReplication="true" passiveReplication="IPR"/>
+      <SyntheticWarmup keyGeneratorClass="org.radargun.stressors.ContentionStringKeyGenerator" numberOfAttributes="NKEYS" sizeOfAnAttribute="1000" numOfThreads="1" transactionSize="
+100"/> 
+        <CacheSize statName="Before"/>
+      <GarbageCollection/>
+      <ResetStats/>
+      <SyntheticPrepareTestBenchmark sizeOfAnAttribute="1000" keyGeneratorClass="org.radargun.stressors.TestPrepareContentionStringKeyGenerator" numberOfAttributes="NKEYS" numOfThre
+ads="1" updateXactWrites="NUMW" updateXactReads="NUMWR" readOnlyXactSize="NUMR" writePercentage="WRITEP" allowBlindWrites="true" duration="90000" retryMode="RETRY_SAME_CLASS" statsS
+amplingInterval="25000" readsBeforeFirstWrite="0" sampleNTCBServiceTime="true" precomputeRWset="false" masterOnlyWrites="true" numRemoteNodesToContact="3"/>
+      <CacheSize statName="After"/>
+        <DumpHistogram/>
+        <CsvReportGeneration/>
+   </benchmark>
+
+   <products>
+      <infinispan4>
+         <config name="cloudtm.xml"/>
+      </infinispan4>
+   </products>
+
+   <reports>
+      <report name="PCvsPR">
+                <item product="infinispan4" config="cloudtm.xml"/>
+      </report>
+   </reports>
+
+</bench-config>

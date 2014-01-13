@@ -28,7 +28,8 @@ public class TestPreparePutGetStressor extends SyntheticPutGetStressor {
       startPoint = new CountDownLatch(1);
       startTime = System.nanoTime();
       for (int threadIndex = 0; threadIndex < numOfThreads; threadIndex++) {
-         Stressor stressor = new TestPrepareStressor(threadIndex, (KeyGenerator) Utils.instantiate(this.getKeyGeneratorClass()), nodeIndex, numberOfKeys);
+         TestPrepareStressor stressor = new TestPrepareStressor(threadIndex, (KeyGenerator) Utils.instantiate(this.getKeyGeneratorClass()), nodeIndex, numberOfKeys);
+         stressor.initFactory();
          stressors.add(stressor);
          stressor.start();
       }
@@ -43,12 +44,18 @@ public class TestPreparePutGetStressor extends SyntheticPutGetStressor {
    }
 
    private class TestPrepareStressor extends SyntheticStressor {
+
       private TestPrepareStressor(int threadIndex, KeyGenerator perThreadKeyGen, int nodeIndex, int numKeys) {
          super(threadIndex, perThreadKeyGen, nodeIndex, numKeys);
+         this.perThreadKeyGen = new TestPrepareContentionStringKeyGenerator(cacheWrapper.getNumMembers(), numKeys);
+         if (log.isTraceEnabled())
+            log.trace(perThreadKeyGen);
       }
 
       protected void initFactory() {
          this.factory = new SyntheticXactFactoryTestPrepare_RunTimeDaP(buildParams());
+         if (traceE)
+            log.trace("Factory " + factory);
       }
 
       protected SyntheticXactParams buildParams() {

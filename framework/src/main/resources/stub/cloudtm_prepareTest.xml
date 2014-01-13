@@ -1,0 +1,125 @@
+<infinispan
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:infinispan:config:5.2 http://www.infinispan.org/schemas/infinispan-config-5.2.xsd"
+        xmlns="urn:infinispan:config:5.2">
+    <global>
+        <globalJmxStatistics
+                enabled="true"
+                jmxDomain="org.infinispan"/>
+        <transport
+                clusterName="infinispan-cluster">
+            <properties>
+                <property
+                        name="configurationFile"
+                        value="jgroups/jgroups-tcp.xml" />
+            </properties>
+        </transport>
+	<serialization>
+      <advancedExternalizers>
+        <advancedExternalizer id="254"
+                              externalizerClass="org.radargun.cachewrappers.TestPrepareHashFunctionFactory$Externalizer"/>
+	 <advancedExternalizer id="253"
+                              externalizerClass="org.radargun.cachewrappers.TestPrepareSingleOwnerContendedStringHash$Externalizer"/>
+	 <advancedExternalizer id="252"
+                              externalizerClass="org.radargun.cachewrappers.TestPrepareHashFunction$Externalizer"/>     
+ </advancedExternalizers>
+    </serialization>
+    </global>
+    <default>
+        <locking
+                isolationLevel="ISO"
+                concurrencyLevel="32"
+                writeSkewCheck="false"
+                useLockStriping="false"
+                lockAcquisitionTimeout="0"/>
+        <transaction
+                transactionManagerLookupClass="org.infinispan.transaction.lookup.DummyTransactionManagerLookup"
+                useEagerLocking="false"
+                transactionMode="TRANSACTIONAL"
+                syncRollbackPhase="false"
+                cacheStopTimeout="30000"
+                useSynchronization="false"
+                syncCommitPhase="false"
+                lockingMode="OPTIMISTIC"
+                eagerLockSingleNode="false"
+                use1PcForAutoCommitTransactions="false"
+                autoCommit="true"
+                transactionProtocol="REPP"
+		>
+		<recovery enabled="false"/>
+       </transaction>
+        <jmxStatistics
+                enabled="true"/>
+        <customStats sampleServiceTimes="true"/>
+	<deadlockDetection
+                enabled="false"/>
+        <clustering mode="d">
+            <sync
+                    replTimeout="15000" />
+            <hash
+                    numOwners="REPD" numSegments="SEG" hashFunctionClass="org.radargun.cachewrappers.TestPrepareHashFunction" factory="org.radargun.cachewrappers.TestPrepareHashFunctionFactory"/>
+            <l1
+                    enabled="false"
+                    onRehash="false"
+                    lifespan="600000"
+                    invalidationThreshold="0" />
+        </clustering>
+        <customInterceptors>
+            <interceptor
+                    after="org.infinispan.interceptors.InvocationContextInterceptor"
+                    class="org.infinispan.distribution.wrappers.CustomStatsInterceptor"/>
+        </customInterceptors>
+        <versioning
+                enabled="true"
+                versioningScheme="VERS" />
+    </default>
+    <namedCache
+            name="x">
+     <locking
+                isolationLevel="ISO"
+                concurrencyLevel="32"
+                writeSkewCheck="false"
+                useLockStriping="false"
+                lockAcquisitionTimeout="0"/>
+        <transaction
+                transactionManagerLookupClass="org.infinispan.transaction.lookup.DummyTransactionManagerLookup"
+                useEagerLocking="false"
+                transactionMode="TRANSACTIONAL"
+                syncRollbackPhase="false"
+                cacheStopTimeout="30000"
+                useSynchronization="false"
+                syncCommitPhase="false"
+                lockingMode="OPTIMISTIC"
+                eagerLockSingleNode="false"
+                use1PcForAutoCommitTransactions="false"
+                autoCommit="true"
+		transactionProtocol="REPP"  
+              >
+		<recovery enabled="false"/>
+	</transaction>
+        <jmxStatistics
+                enabled="true"/>
+	<customStats sampleServiceTimes="true"/>
+        <deadlockDetection
+                enabled="false"/>
+        <clustering mode="d">
+            <sync
+                    replTimeout="15000" />
+            <hash
+                    numOwners="REPD" numSegments="SEG" hashFunctionClass="org.radargun.cachewrappers.TestPrepareHashFunction" factory="org.radargun.cachewrappers.TestPrepareHashFunctionFactory"/>
+            <l1
+                    enabled="false"
+                    onRehash="false"
+                    lifespan="600000"
+                    invalidationThreshold="0" />
+        </clustering>
+        <customInterceptors>
+             <interceptor
+                    after="org.infinispan.interceptors.InvocationContextInterceptor"
+                    class="org.infinispan.distribution.wrappers.CustomStatsInterceptor"/>
+        </customInterceptors>
+        <versioning
+                enabled="true"
+                versioningScheme="VERS" />
+	</namedCache>
+</infinispan>

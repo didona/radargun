@@ -69,8 +69,6 @@ public class PutGetStressor extends AbstractCacheWrapperStressor {
    private String keyGeneratorClass = StringKeyGenerator.class.getName();
 
    protected KeyGenerator keyGenerator;
-
-
    protected long statsSamplingInterval = 0;
 
 

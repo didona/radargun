@@ -1,9 +1,9 @@
 package org.radargun.stages.synthetic.runtimeDap;
 
-import org.radargun.stages.synthetic.common.synth.SyntheticDistinctXactFactory;
-import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
 import org.radargun.stages.synthetic.common.XACT_RETRY;
 import org.radargun.stages.synthetic.common.XactOp;
+import org.radargun.stages.synthetic.common.synth.SyntheticDistinctXactFactory;
+import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
 
 /**
  * // TODO: Document this
@@ -22,7 +22,12 @@ public class SyntheticXactFactory_RunTimeDaP extends SyntheticDistinctXactFactor
       roRead = params.getROGets();
       upRead = params.getUpReads();
       upWrite = params.getUpPuts();
-      if(upRead<upWrite)
+      sanityCheck();
+
+   }
+
+   protected void sanityCheck() {
+      if (upRead < upWrite)
          throw new IllegalArgumentException("For now, numWrites has to be <= numReads");
       if (params.getXact_retry().equals(XACT_RETRY.RETRY_SAME_XACT))
          throw new IllegalArgumentException("For now, runTimeDap transactions cannot be exactly retried. Only no_retry or same_class is allowed");

@@ -4,11 +4,7 @@ import org.radargun.stages.synthetic.common.XactOp;
 import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
 import org.radargun.stressors.KeyGenerator;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * // TODO: Document this
@@ -94,5 +90,25 @@ public class IteratorRuntimeDap_UP implements Iterator<XactOp> {
       StringBuilder sb = new StringBuilder();
       for (int i = 0; i < size / 2; i++) sb.append((char) (64 + r.nextInt(26)));
       return sb.toString();
+   }
+
+   @Override
+   public String toString() {
+      return "IteratorRuntimeDap_UP{" +
+              "readSet=" + readSet +
+              ", writeSet=" + writeSet +
+              ", params=" + params +
+              ", rwB=" + Arrays.toString(rwB) +
+              ", currentOp=" + currentOp +
+              ", keyGen=" + keyGen +
+              ", r=" + r +
+              ", numKeys=" + numKeys +
+              ", nodeIndex=" + nodeIndex +
+              ", threadIndex=" + threadIndex +
+              ", blindWriteAllowed=" + blindWriteAllowed +
+              ", sizeOfAttribute=" + sizeOfAttribute +
+              ", indexNextWrite=" + indexNextWrite +
+              ", toDo=" + toDo +
+              '}';
    }
 }
