@@ -1,0 +1,14 @@
+#!/bin/bash
+
+source ~/.openrc.sh
+vrs="ddk_v1"
+flav=m1.xmedium
+if [ $# -eq 2 ]
+then
+    nova  boot --image ${vrs} --flavor="${flav}" --key-name didonaOsKey gmu${1} --availability-zone nova:node${2}
+else
+    nova  boot --image ${vrs} --flavor="${flav}" --key-name didonaOsKey gmu${1}
+fi
+sleep 10
+
+echo "Done. Remember to save ips and init the vm"

@@ -1,0 +1,5 @@
+#!/bin/bash
+for n in $(cat machines)
+do
+nc -z $n 22; echo $n $?
+done

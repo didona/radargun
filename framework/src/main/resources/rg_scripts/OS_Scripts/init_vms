@@ -1,0 +1,5 @@
+#!/bin/bash
+for n in $(cat machines)
+do
+sudo ssh $n 'iptables -F'
+done

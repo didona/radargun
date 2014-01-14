@@ -1,0 +1,10 @@
+#!/bin/bash
+# cluster-fork COMMANDS
+# Script to execute COMMANDS in all nodes in /etc/machines
+# Juan Caballero @ Cinvestav 2008
+
+for NODE in node{01..10}
+do
+    echo $NODE:
+    ssh $NODE "nova-manage service enable $NODE nova-compute"
+done

@@ -1,0 +1,1 @@
+<org.infinispan.distribution.wrappers.Histogram min="0" max="500000" step="100" fileName="NAME"/>

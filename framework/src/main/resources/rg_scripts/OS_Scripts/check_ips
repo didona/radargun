@@ -1,0 +1,5 @@
+#!/bin/bash
+source ~/.openrc.sh
+rm machines
+touch machines
+nova list | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' > machines

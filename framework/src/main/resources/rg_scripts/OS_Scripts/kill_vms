@@ -1,0 +1,16 @@
+#!/bin/bash
+
+source ~/.openrc.sh
+base=1
+limit=140
+let last=${base}+${limit}-1
+
+echo "Going to kill gmu${base} to gmu${last}"
+for (( c=${base}; c<=${last}; c++ ))
+do
+#    tmp=$((10#$NODE % 10))
+ #   target=$((tmp + 20))
+  #  echo "instance$NODE => node$target"
+    nova delete gmu${c}
+ #sleep 2
+done

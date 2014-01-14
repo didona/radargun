@@ -1,0 +1,29 @@
+#!/bin/bash
+echo "Deleting known_hosts"
+rm ~/.ssh/known_hosts
+
+source ~/.openrc.sh
+base=1
+limit=40
+flav=16
+#let last=${base}+${limit}-1
+let last=${limit}
+vrs="GMU_0.0.32"
+
+echo "Going to spawn ${limit} nodes from ${base} to ${last}"
+echo "The chosen flavor is ${flav} and the image is ${vrs}"
+for (( c=${base}; c<=${last}; c++ ))
+do
+echo "spawning instance ${c}"
+#    tmp=$((10#$NODE % 10))
+ #   target=$((tmp + 20))
+  #  echo "instance$NODE => node$target"
+    nova  boot --image "${vrs}" --flavor="${flav}" --key-name didonaOsKey gmu${c} #--availability-zone nova:node$target
+sleep 15
+done
+
+echo "Exporting ips"
+
+./check_ips
+
+echo "Done. Remember to run also init_vms as soon as they are ready"
