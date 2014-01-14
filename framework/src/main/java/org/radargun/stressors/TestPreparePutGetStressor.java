@@ -1,7 +1,8 @@
 package org.radargun.stressors;
 
 import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
-import org.radargun.stages.synthetic.runtimeDap.prepareTest.SyntheticXactFactoryTestPrepare_RunTimeDaP;
+import org.radargun.stages.synthetic.runtimeDap.prepareTest.MultiOwnerSingleOp.SyntheticXactFactoryMultiOwnerSingleOp_RunTimeDaP;
+import org.radargun.stages.synthetic.runtimeDap.prepareTest.oneOwnerMultiOp.SyntheticXactFactoryTestPrepare_RunTimeDaP;
 import org.radargun.utils.Utils;
 
 import java.util.ArrayList;
@@ -18,9 +19,15 @@ public class TestPreparePutGetStressor extends SyntheticPutGetStressor {
 
    private int numRemoteNodeToContact;
    private boolean onlyOneWriter;
+   private boolean onePutMultipleOwners;
+
 
    public void setNumRemoteNodeToContact(int numRemoteNodeToContact) {
       this.numRemoteNodeToContact = numRemoteNodeToContact;
+   }
+
+   public void setOnePutMultipleOwners(boolean onePutMultipleOwners) {
+      this.onePutMultipleOwners = onePutMultipleOwners;
    }
 
    public void setOnlyOneWriter(boolean onlyOneWriter) {
@@ -64,7 +71,10 @@ public class TestPreparePutGetStressor extends SyntheticPutGetStressor {
       }
 
       protected void initFactory() {
-         this.factory = new SyntheticXactFactoryTestPrepare_RunTimeDaP(buildParams());
+         if (onePutMultipleOwners)
+            this.factory = new SyntheticXactFactoryMultiOwnerSingleOp_RunTimeDaP(buildParams());
+         else
+            this.factory = new SyntheticXactFactoryTestPrepare_RunTimeDaP(buildParams());
          if (traceE)
             log.trace("Factory " + factory);
       }

@@ -13,6 +13,11 @@ public class SyntheticPrepareTestBenchmarkStage extends SyntheticBenchmarkStage 
 
    private int numRemoteNodesToContact;
    private boolean onlyOneWriter;
+   private boolean onePutMultipleOwners;
+
+   public void setOnePutMultipleOwners(String onePutMultipleOwners) {
+      this.onePutMultipleOwners = Boolean.valueOf(onePutMultipleOwners);
+   }
 
    public void setOnlyOneWriter(String onlyOneWriter) {
       this.onlyOneWriter = Boolean.valueOf(onlyOneWriter);
@@ -35,5 +40,6 @@ public class SyntheticPrepareTestBenchmarkStage extends SyntheticBenchmarkStage 
       super.initPutGetStressor(putGetStressor);
       ((TestPreparePutGetStressor) putGetStressor).setNumRemoteNodeToContact(numRemoteNodesToContact);
       ((TestPreparePutGetStressor) putGetStressor).setOnlyOneWriter(this.onlyOneWriter);
+      ((TestPreparePutGetStressor) putGetStressor).setOnePutMultipleOwners(this.onePutMultipleOwners);
    }
 }

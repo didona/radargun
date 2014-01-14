@@ -1,4 +1,4 @@
-package org.radargun.stages.synthetic.runtimeDap.prepareTest;
+package org.radargun.stages.synthetic.runtimeDap.prepareTest.oneOwnerMultiOp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

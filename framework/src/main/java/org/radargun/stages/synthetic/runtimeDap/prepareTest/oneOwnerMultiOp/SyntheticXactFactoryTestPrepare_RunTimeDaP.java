@@ -1,4 +1,4 @@
-package org.radargun.stages.synthetic.runtimeDap.prepareTest;
+package org.radargun.stages.synthetic.runtimeDap.prepareTest.oneOwnerMultiOp;
 
 import org.radargun.stages.synthetic.common.XACT_RETRY;
 import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
