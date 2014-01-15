@@ -7,8 +7,6 @@ import org.radargun.stages.synthetic.common.synth.SyntheticXactParams;
 import org.radargun.stages.synthetic.runtimeDap.IteratorRuntimeDap_UP;
 import org.radargun.stressors.ContentionStringKeyGenerator;
 
-import java.util.HashMap;
-
 /**
  * // TODO: Document this
  *
@@ -44,7 +42,6 @@ public class IteratorRunTimeDapMultipleOwnersOneOp_UP extends IteratorRuntimeDap
    }
 
 
-   private HashMap<Integer, Integer> keyToNode = new HashMap<Integer, Integer>();
    private final static Log log = LogFactory.getLog(IteratorRunTimeDapMultipleOwnersOneOp_UP.class);
    private final static boolean trace = log.isTraceEnabled();
 
@@ -103,6 +100,7 @@ public class IteratorRunTimeDapMultipleOwnersOneOp_UP extends IteratorRuntimeDap
             throw new RuntimeException("I told you only one blind write!");
          }
       }
+      currentOp++;
       return toRet;
    }
 
