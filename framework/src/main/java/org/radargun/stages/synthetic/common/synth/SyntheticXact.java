@@ -35,8 +35,8 @@ public abstract class SyntheticXact extends Xact {
    @Override
    public String toString() {
       return "SyntheticXact{" +
-            ", ops=" + Arrays.toString(ops) +
-            '}';
+              ", ops=" + Arrays.toString(ops) +
+              '}';
    }
 
    @Override
