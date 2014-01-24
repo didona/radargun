@@ -88,6 +88,11 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
          }
          results.put("THROUGHPUT", (((throughput + 0.0) * 1000) / executiontime) + "");
          results.put("TOTAL_RESTARTS", aborts + "");
+         results.put("NUM_THREADS", str(threads));
+         results.put("NUM_KEYS", str(recordcount));
+         results.put("DATA_ACCESS_PATTERN", str(generator));
+         results.put("SKEW", String.valueOf(zipf_const));
+         results.putAll(cacheWrapper.getAdditionalStats());
          log.info(sizeInfo);
          result.setPayload(results);
          return result;
@@ -97,6 +102,10 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
          result.setRemoteException(e);
          return result;
       }
+   }
+
+   protected String str(Object o) {
+      return String.valueOf(o);
    }
 
    public boolean processAckOnMaster(List<DistStageAck> acks, MasterState masterState) {
