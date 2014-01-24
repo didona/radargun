@@ -18,11 +18,11 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
 
    private transient YCSBStressor[] ycsbStressors;
 
-   private int multiplereadcount;
-   private int recordcount;
-   private int executiontime;
+   private int multipleReadCount;
+   private int recordCount;
+   private int executionTime;
    private int threads;
-   private int readonly;
+   private int readOnly;
    private boolean allowBlindWrites = true;
    private e_gen generator = null;
    private double zipf_const = .99D;
@@ -40,15 +40,15 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
 
       log.info("Starting YCSBBenchmarkStage: " + this.toString());
 
-      YCSB.init(this.readonly, recordcount);
+      YCSB.init(this.readOnly, recordCount);
       ycsbStressors = new YCSBStressor[threads];
 
       for (int t = 0; t < ycsbStressors.length; t++) {
 
          ycsbStressors[t] = new YCSBStressor();
          ycsbStressors[t].setCacheWrapper(cacheWrapper);
-         ycsbStressors[t].setRecordCount(this.recordcount);
-         ycsbStressors[t].setMultiplereadcount(this.multiplereadcount);
+         ycsbStressors[t].setRecordCount(this.recordCount);
+         ycsbStressors[t].setMultiplereadcount(this.multipleReadCount);
          ycsbStressors[t].setAllowBlindWrites(this.allowBlindWrites);
          if (generator != null) {
             ycsbStressors[t].setIg(buildIntegerGenerator());
@@ -65,7 +65,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
             workers[t].start();
          }
          try {
-            Thread.sleep(executiontime);
+            Thread.sleep(executionTime);
          } catch (InterruptedException e) {
          }
          for (int t = 0; t < workers.length; t++) {
@@ -86,10 +86,10 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
             aborts += ycsbStressors[t].getRestarts();
             throughput += ycsbStressors[t].getThroughput();
          }
-         results.put("THROUGHPUT", (((throughput + 0.0) * 1000) / executiontime) + "");
+         results.put("THROUGHPUT", (((throughput + 0.0) * 1000) / executionTime) + "");
          results.put("TOTAL_RESTARTS", aborts + "");
          results.put("NUM_THREADS", str(threads));
-         results.put("NUM_KEYS", str(recordcount));
+         results.put("NUM_KEYS", str(recordCount));
          results.put("DATA_ACCESS_PATTERN", str(generator));
          results.put("SKEW", String.valueOf(zipf_const));
          results.putAll(cacheWrapper.getAdditionalStats());
@@ -146,28 +146,28 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
       this.cacheWrapper = cacheWrapper;
    }
 
-   public int getMultiplereadcount() {
-      return multiplereadcount;
+   public int getMultipleReadCount() {
+      return multipleReadCount;
    }
 
-   public void setMultiplereadcount(int multiplereadcount) {
-      this.multiplereadcount = multiplereadcount;
+   public void setMultipleReadCount(int multipleReadCount) {
+      this.multipleReadCount = multipleReadCount;
    }
 
-   public int getRecordcount() {
-      return recordcount;
+   public int getRecordCount() {
+      return recordCount;
    }
 
-   public void setRecordcount(int recordcount) {
-      this.recordcount = recordcount;
+   public void setRecordCount(int recordCount) {
+      this.recordCount = recordCount;
    }
 
-   public int getExecutiontime() {
-      return executiontime;
+   public int getExecutionTime() {
+      return executionTime;
    }
 
-   public void setExecutiontime(int executiontime) {
-      this.executiontime = executiontime;
+   public void setExecutionTime(int executionTime) {
+      this.executionTime = executionTime;
    }
 
    public int getThreads() {
@@ -178,12 +178,12 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
       this.threads = threads;
    }
 
-   public int getReadonly() {
-      return readonly;
+   public int getReadOnly() {
+      return readOnly;
    }
 
-   public void setReadonly(int readonly) {
-      this.readonly = readonly;
+   public void setReadOnly(int readOnly) {
+      this.readOnly = readOnly;
    }
 
    public boolean isAllowBlindWrites() {
@@ -214,11 +214,11 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
    private IntegerGenerator buildIntegerGenerator() {
       switch (this.generator) {
          case UNIFORM:
-            return new UniformIntegerGenerator(0, recordcount);
+            return new UniformIntegerGenerator(0, recordCount);
          case SKEWED_LAST:
             return new SkewedLatestGenerator(new CounterGenerator(0));
          case ZIPF:
-            return new ZipfianGenerator(recordcount, zipf_const);
+            return new ZipfianGenerator(recordCount, zipf_const);
          default:
             throw new IllegalArgumentException(this.generator + " is not a valid generator. Valid values are " + Arrays.toString(e_gen.values()));
       }
