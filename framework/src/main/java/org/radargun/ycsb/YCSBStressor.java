@@ -5,7 +5,9 @@ import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
 import org.radargun.stamp.vacation.VacationStressor;
 import org.radargun.stressors.AbstractCacheWrapperStressor;
+import org.radargun.ycsb.generators.IntegerGenerator;
 import org.radargun.ycsb.transaction.RMW;
+import org.radargun.ycsb.transaction.RMW_IG;
 import org.radargun.ycsb.transaction.Read;
 import org.radargun.ycsb.transaction.YCSBTransaction;
 
@@ -33,6 +35,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
 
    //The random should *not* be shared among threads!!
    protected Random r = new Random();
+   private IntegerGenerator ig = null;
 
    public void setCacheWrapper(CacheWrapper cacheWrapper) {
       this.cacheWrapper = cacheWrapper;
@@ -49,6 +52,9 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
       if (ran < YCSB.readOnly) {
          return new Read(keynum);
       } else {
+         if (ig != null) {
+            return new RMW_IG(keynum, Math.abs(r.nextInt()), multiplereadcount, recordCount, allowBlindWrites, ig);
+         }
          return new RMW(keynum, Math.abs(r.nextInt()), multiplereadcount, recordCount, allowBlindWrites);
       }
    }
@@ -147,5 +153,13 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
 
    public void setAllowBlindWrites(boolean allowBlindWrites) {
       this.allowBlindWrites = allowBlindWrites;
+   }
+
+   public IntegerGenerator getIg() {
+      return ig;
+   }
+
+   public void setIg(IntegerGenerator ig) {
+      this.ig = ig;
    }
 }

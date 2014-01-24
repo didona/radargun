@@ -6,11 +6,9 @@ import org.radargun.stamp.vacation.VacationStressor;
 import org.radargun.state.MasterState;
 import org.radargun.ycsb.YCSB;
 import org.radargun.ycsb.YCSBStressor;
+import org.radargun.ycsb.generators.*;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class YCSBBenchmarkStage extends AbstractDistStage {
 
@@ -26,6 +24,8 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
    private int threads;
    private int readonly;
    private boolean allowBlindWrites = true;
+   private e_gen generator = null;
+   private double zipf_const = .99D;
 
    @Override
    public DistStageAck executeOnSlave() {
@@ -48,6 +48,9 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
          ycsbStressors[t].setRecordCount(this.recordcount);
          ycsbStressors[t].setMultiplereadcount(this.multiplereadcount);
          ycsbStressors[t].setAllowBlindWrites(this.allowBlindWrites);
+         if (generator != null) {
+            ycsbStressors[t].setIg(buildIntegerGenerator());
+         }
       }
 
       try {
@@ -178,4 +181,29 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
    public void setAllowBlindWrites(boolean allowBlindWrites) {
       this.allowBlindWrites = allowBlindWrites;
    }
+
+
+   public void setGenerator(String generator) {
+      this.generator = e_gen.valueOf(generator);
+   }
+
+
+   private IntegerGenerator buildIntegerGenerator() {
+      switch (this.generator) {
+         case UNIFORM:
+            return new UniformIntegerGenerator(0, recordcount);
+         case SKEWED_LAST:
+            return new SkewedLatestGenerator(new CounterGenerator(0));
+         case ZIPF:
+            return new ZipfianGenerator(recordcount, zipf_const);
+         default:
+            throw new IllegalArgumentException(this.generator + " is not a valid generator. Valid values are " + Arrays.toString(e_gen.values()));
+      }
+
+   }
+
+   private enum e_gen {
+      UNIFORM, ZIPF, SKEWED_LAST
+   }
+
 }

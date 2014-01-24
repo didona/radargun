@@ -5,31 +5,24 @@ import org.radargun.ycsb.ByteIterator;
 import org.radargun.ycsb.RandomByteIterator;
 import org.radargun.ycsb.StringByteIterator;
 import org.radargun.ycsb.YCSB;
+import org.radargun.ycsb.generators.IntegerGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RMW extends YCSBTransaction {
+/**
+ * // TODO: Document this
+ *
+ * @author diego
+ * @since 4.0
+ */
+public class RMW_IG extends RMW {
 
-   private int k;
-   protected int multiplereadcount;
-   protected int random;
-   private int recordCount;
-   protected boolean blindWrites = true;
+   private IntegerGenerator integerGenerator;
 
-   public RMW(int k, int random, int multiplereadcount, int recordCount) {
-      this.random = Math.abs(random);
-      this.k = k;
-      this.multiplereadcount = multiplereadcount;
-      this.recordCount = recordCount;
-   }
-
-   public RMW(int k, int random, int multiplereadcount, int recordCount, boolean blindWrites) {
-      this.random = Math.abs(random);
-      this.k = k;
-      this.multiplereadcount = multiplereadcount;
-      this.recordCount = recordCount;
-      this.blindWrites = blindWrites;
+   public RMW_IG(int k, int random, int multiplereadcount, int recordCount, boolean blindWrites, IntegerGenerator integerGenerator) {
+      super(k, random, multiplereadcount, recordCount, blindWrites);
+      this.integerGenerator = integerGenerator;
    }
 
    @Override
@@ -44,22 +37,19 @@ public class RMW extends YCSBTransaction {
 
       Map<String, String> row = StringByteIterator.getStringMap(values);
       int toWrite = (Math.abs(random)) % multiplereadcount;
+      int next;
       for (int i = 0; i < multiplereadcount; i++) {
+         next = integerGenerator.nextInt();
          if (toWrite == i) {
             //If we do not want blind writes, then we have to read the user and then write to it
             if (!blindWrites) {
-               cacheWrapper.get(null, "user" + ((k + i) % recordCount));
+               cacheWrapper.get(null, "user" + next);
             }
-            cacheWrapper.put(null, "user" + ((k + i) % recordCount), row);
+            cacheWrapper.put(null, "user" + next, row);
          } else {
-            cacheWrapper.get(null, "user" + ((k + i) % recordCount));
+            cacheWrapper.get(null, "user" + next);
          }
       }
 
-   }
-
-   @Override
-   public boolean isReadOnly() {
-      return false;
    }
 }
