@@ -28,6 +28,8 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
    private int multiplereadcount;
    private int recordCount;
 
+
+   private int numWrites = 1;
    private long restarts = 0;
    private long throughput = 0;
 
@@ -53,7 +55,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
          return new Read(keynum);
       } else {
          if (ig != null) {
-            return new RMW_IG(keynum, Math.abs(r.nextInt()), multiplereadcount, recordCount, allowBlindWrites, ig);
+            return new RMW_IG(keynum, Math.abs(r.nextInt() % numWrites), multiplereadcount, recordCount, allowBlindWrites, ig);
          }
          return new RMW(keynum, Math.abs(r.nextInt()), multiplereadcount, recordCount, allowBlindWrites);
       }
@@ -161,5 +163,13 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
 
    public void setIg(IntegerGenerator ig) {
       this.ig = ig;
+   }
+
+   public int getNumWrites() {
+      return numWrites;
+   }
+
+   public void setNumWrites(int numWrites) {
+      this.numWrites = numWrites;
    }
 }

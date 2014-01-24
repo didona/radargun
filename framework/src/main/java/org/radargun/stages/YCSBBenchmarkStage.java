@@ -26,6 +26,8 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
    private boolean allowBlindWrites = true;
    private e_gen generator = null;
    private double zipf_const = .99D;
+   private int numWrites = 1;
+
 
    @Override
    public DistStageAck executeOnSlave() {
@@ -50,6 +52,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
          ycsbStressors[t].setAllowBlindWrites(this.allowBlindWrites);
          if (generator != null) {
             ycsbStressors[t].setIg(buildIntegerGenerator());
+            ycsbStressors[t].setNumWrites(this.numWrites);
          }
       }
 
@@ -187,6 +190,13 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
       this.generator = e_gen.valueOf(generator);
    }
 
+   public int getNumWrites() {
+      return numWrites;
+   }
+
+   public void setNumWrites(int numWrites) {
+      this.numWrites = numWrites;
+   }
 
    private IntegerGenerator buildIntegerGenerator() {
       switch (this.generator) {

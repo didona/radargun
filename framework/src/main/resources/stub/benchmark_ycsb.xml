@@ -1,0 +1,30 @@
+<bench-config>
+
+   <master bindAddress="${127.0.0.1:master.address}" port="${2103:master.port}"/>
+
+   <benchmark initSize="INITS" maxSize="MAXS" increment="INCS">
+      <StartCluster ignorePutResult="true" staggerSlaveStartup="true" delayAfterFirstSlaveStarts="5000" delayBetweenStartingSlaves = "1000"/>
+      <ClusterValidation partialReplication="true" passiveReplication="IPR"/>
+<YCSBPopulation recordCount="NKEYS"/>        
+<CacheSize statName="Before"/>
+      <GarbageCollection/>
+      <ResetStats/>
+	<YCSBBenchmark recordCount="NKEYS" threads="1" multipleReadCount="NUMWR" executionTime="300000" zipf_const="ZIPF" generator="GEN" allowBlindWrites="false" readOnly="READO" numWrites="NUMW"/>      
+<CacheSize statName="After"/>
+        <DumpHistogram/>
+        <CsvReportGeneration/>
+   </benchmark>
+
+   <products>
+      <infinispan4>
+         <config name="cloudtm.xml"/>
+      </infinispan4>
+   </products>
+
+   <reports>
+      <report name="PCvsPR">
+                <item product="infinispan4" config="cloudtm.xml"/>
+      </report>
+   </reports>
+
+</bench-config>
