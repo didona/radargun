@@ -198,6 +198,10 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
       this.numWrites = numWrites;
    }
 
+   public void setZipf_const(double zipf_const) {
+      this.zipf_const = zipf_const;
+   }
+
    private IntegerGenerator buildIntegerGenerator() {
       switch (this.generator) {
          case UNIFORM:
