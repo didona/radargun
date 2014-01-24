@@ -86,6 +86,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
             aborts += ycsbStressors[t].getRestarts();
             throughput += ycsbStressors[t].getThroughput();
          }
+         results.put("DURATION", str(executionTime));
          results.put("THROUGHPUT", (((throughput + 0.0) * 1000) / executionTime) + "");
          results.put("TOTAL_RESTARTS", aborts + "");
          results.put("NUM_THREADS", str(threads));
