@@ -25,6 +25,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
    private int executiontime;
    private int threads;
    private int readonly;
+   private boolean allowBlindWrites = true;
 
    @Override
    public DistStageAck executeOnSlave() {
@@ -46,6 +47,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
          ycsbStressors[t].setCacheWrapper(cacheWrapper);
          ycsbStressors[t].setRecordCount(this.recordcount);
          ycsbStressors[t].setMultiplereadcount(this.multiplereadcount);
+         ycsbStressors[t].setAllowBlindWrites(this.allowBlindWrites);
       }
 
       try {
@@ -167,5 +169,13 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
 
    public void setReadonly(int readonly) {
       this.readonly = readonly;
+   }
+
+   public boolean isAllowBlindWrites() {
+      return allowBlindWrites;
+   }
+
+   public void setAllowBlindWrites(boolean allowBlindWrites) {
+      this.allowBlindWrites = allowBlindWrites;
    }
 }

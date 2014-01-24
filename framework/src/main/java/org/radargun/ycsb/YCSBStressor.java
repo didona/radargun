@@ -29,7 +29,10 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
    private long restarts = 0;
    private long throughput = 0;
 
-   public static Random r = new Random();
+   private boolean allowBlindWrites = true;
+
+   //The random should *not* be shared among threads!!
+   protected Random r = new Random();
 
    public void setCacheWrapper(CacheWrapper cacheWrapper) {
       this.cacheWrapper = cacheWrapper;
@@ -46,7 +49,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
       if (ran < YCSB.readOnly) {
          return new Read(keynum);
       } else {
-         return new RMW(keynum, Math.abs(r.nextInt()), multiplereadcount, recordCount);
+         return new RMW(keynum, Math.abs(r.nextInt()), multiplereadcount, recordCount, allowBlindWrites);
       }
    }
 
@@ -78,7 +81,6 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
          } catch (Throwable e) {
             successful = false;
          }
-
          try {
             cacheWrapper.endTransaction(successful);
 
@@ -139,5 +141,11 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
       this.m_phase = shutdownPhase;
    }
 
+   public boolean isAllowBlindWrites() {
+      return allowBlindWrites;
+   }
 
+   public void setAllowBlindWrites(boolean allowBlindWrites) {
+      this.allowBlindWrites = allowBlindWrites;
+   }
 }

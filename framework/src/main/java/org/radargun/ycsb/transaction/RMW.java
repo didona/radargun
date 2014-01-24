@@ -15,12 +15,21 @@ public class RMW extends YCSBTransaction {
    private int multiplereadcount;
    private int random;
    private int recordCount;
+   private boolean blindWrites = true;
 
    public RMW(int k, int random, int multiplereadcount, int recordCount) {
       this.random = Math.abs(random);
       this.k = k;
       this.multiplereadcount = multiplereadcount;
       this.recordCount = recordCount;
+   }
+
+   public RMW(int k, int random, int multiplereadcount, int recordCount, boolean blindWrites) {
+      this.random = Math.abs(random);
+      this.k = k;
+      this.multiplereadcount = multiplereadcount;
+      this.recordCount = recordCount;
+      this.blindWrites = blindWrites;
    }
 
    @Override
@@ -37,6 +46,10 @@ public class RMW extends YCSBTransaction {
       int toWrite = (Math.abs(random)) % multiplereadcount;
       for (int i = 0; i < multiplereadcount; i++) {
          if (toWrite == i) {
+            //If we do not want blind writes, then we have to read the user and then write to it
+            if (!blindWrites) {
+               cacheWrapper.get(null, "user" + ((k + i) % recordCount));
+            }
             cacheWrapper.put(null, "user" + ((k + i) % recordCount), row);
          } else {
             cacheWrapper.get(null, "user" + ((k + i) % recordCount));
