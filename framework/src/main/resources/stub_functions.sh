@@ -159,3 +159,16 @@ function change_keys(){
 sed -i "s/NKEYS/$1/g" ${bench}
 }
 
+function change_zipf(){
+sed -i "s/ZIPF_P/$1/g" ${bench}
+}
+
+function change_generator(){
+sed -i "s/GEN/$1/g" ${bench}
+}
+
+function change_readOnly(){
+sed -i "s/READO/$1/g" ${bench}
+}
+
+

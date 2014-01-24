@@ -9,7 +9,7 @@
 <CacheSize statName="Before"/>
       <GarbageCollection/>
       <ResetStats/>
-	<YCSBBenchmark recordCount="NKEYS" threads="1" multipleReadCount="NUMWR" executionTime="300000" zipf_const="ZIPF" generator="GEN" allowBlindWrites="false" readOnly="READO" numWrites="NUMW"/>      
+	<YCSBBenchmark recordCount="NKEYS" threads="1" multipleReadCount="NUMWR" executionTime="300000" zipf_const="ZIPF_P" generator="GEN" allowBlindWrites="false" readOnly="READO" numWrites="NUMW"/>      
 <CacheSize statName="After"/>
         <DumpHistogram/>
         <CsvReportGeneration/>
