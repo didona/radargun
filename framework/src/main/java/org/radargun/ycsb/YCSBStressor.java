@@ -3,6 +3,7 @@ package org.radargun.ycsb;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
+import org.radargun.stages.synthetic.common.XACT_RETRY;
 import org.radargun.stamp.vacation.VacationStressor;
 import org.radargun.stressors.AbstractCacheWrapperStressor;
 import org.radargun.ycsb.generators.IntegerGenerator;
@@ -21,6 +22,8 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
 
    public static final int TEST_PHASE = 2;
    public static final int SHUTDOWN_PHASE = 3;
+
+   private XACT_RETRY retryMode = XACT_RETRY.RETRY_SAME_CLASS;
 
    volatile protected int m_phase = TEST_PHASE;
 
@@ -76,13 +79,14 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
    }
 
    private void processTransaction(CacheWrapper wrapper, YCSBTransaction transaction) {
-      boolean successful = true;
+      boolean successful = false;
 
-      while (true) {
+      while (!successful) {
          if (m_phase != TEST_PHASE) {
             this.throughput--;
-            break;
+            return;
          }
+         successful = true;
          cacheWrapper.startTransaction(transaction.isReadOnly());
          try {
             transaction.executeTransaction(cacheWrapper);
@@ -91,7 +95,6 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
          }
          try {
             cacheWrapper.endTransaction(successful);
-
             if (!successful) {
                setRestarts(getRestarts() + 1);
             }
@@ -99,12 +102,8 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
             setRestarts(getRestarts() + 1);
             successful = false;
          }
-
-         if (!successful) {
-            successful = true;
-         } else {
+         if (retryMode == XACT_RETRY.NO_RETRY)
             break;
-         }
       }
    }
 
@@ -172,4 +171,49 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
    public void setNumWrites(int numWrites) {
       this.numWrites = numWrites;
    }
+
+   public XACT_RETRY getRetryMode() {
+      return retryMode;
+   }
+
+   public void setRetryMode(String retryMode) {
+      this.retryMode = XACT_RETRY.valueOf(retryMode);
+      if (this.retryMode == XACT_RETRY.RETRY_SAME_XACT)
+         throw new IllegalArgumentException(this.retryMode + " not supported yet");
+   }
+
+   /**
+    * private void processTransaction(CacheWrapper wrapper, YCSBTransaction transaction) {
+    boolean successful = true;
+
+    while (true) {
+    if (m_phase != TEST_PHASE) {
+    this.throughput--;
+    break;
+    }
+    cacheWrapper.startTransaction(transaction.isReadOnly());
+    try {
+    transaction.executeTransaction(cacheWrapper);
+    } catch (Throwable e) {
+    successful = false;
+    }
+    try {
+    cacheWrapper.endTransaction(successful);
+
+    if (!successful) {
+    setRestarts(getRestarts() + 1);
+    }
+    } catch (Throwable rb) {
+    setRestarts(getRestarts() + 1);
+    successful = false;
+    }
+
+    if (!successful) {
+    successful = true;
+    } else {
+    break;
+    }
+    }
+    }
+    */
 }
