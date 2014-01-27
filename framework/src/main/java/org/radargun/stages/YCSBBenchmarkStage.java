@@ -217,7 +217,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
          case UNIFORM:
             return new UniformIntegerGenerator(0, recordCount);
          case SKEWED_LAST:
-            return new SkewedLatestGenerator(new CounterGenerator(0));
+            return new SkewedLatestGenerator(new CounterGenerator(recordCount), zipf_const);
          case ZIPF:
             return new ZipfianGenerator(recordCount, zipf_const);
          default:

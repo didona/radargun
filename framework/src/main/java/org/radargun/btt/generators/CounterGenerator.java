@@ -1,12 +1,12 @@
-/**
+/**                                                                                                                                                                                
  * Copyright (c) 2010 Yahoo! Inc. All rights reserved.                                                                                                                             
- *
+ *                                                                                                                                                                                 
  * Licensed under the Apache License, Version 2.0 (the "License"); you                                                                                                             
  * may not use this file except in compliance with the License. You                                                                                                                
  * may obtain a copy of the License at                                                                                                                                             
- *
+ *                                                                                                                                                                                 
  * http://www.apache.org/licenses/LICENSE-2.0                                                                                                                                      
- *
+ *                                                                                                                                                                                 
  * Unless required by applicable law or agreed to in writing, software                                                                                                             
  * distributed under the License is distributed on an "AS IS" BASIS,                                                                                                               
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or                                                                                                                 
@@ -15,48 +15,37 @@
  * LICENSE file.                                                                                                                                                                   
  */
 
-package org.radargun.ycsb.generators;
-
+package org.radargun.btt.generators;
 /**
- * Generate a popularity distribution of items, skewed to favor recent items significantly more than older items.
+ * Generates a sequence of integers 0, 1, ...
  */
-public class SkewedLatestGenerator extends IntegerGenerator {
-   CounterGenerator _basis;
-   ZipfianGenerator _zipfian;
+public class CounterGenerator extends IntegerGenerator
+{
+    int counter;
 
-   public SkewedLatestGenerator(CounterGenerator basis) {
-      _basis = basis;
-      _zipfian = new ZipfianGenerator(Integer.parseInt(_basis.lastString()));
-      nextInt();
-   }
+    /**
+     * Create a counter that starts at countstart
+     */
+    public CounterGenerator(int countstart)
+    {
+	counter=countstart;
+	setLastInt(countstart-1);
+    }
 
-   public SkewedLatestGenerator(CounterGenerator basis, double zipf_const) {
-      _basis = basis;
-      _zipfian = new ZipfianGenerator(Integer.parseInt(_basis.lastString()), zipf_const);
-      nextInt();
-   }
+    /**
+     * If the generator returns numeric (integer) values, return the next value as an int. Default is to return -1, which
+     * is appropriate for generators that do not return numeric values.
+     */
+    public synchronized int nextInt() 
+    {
+	int lastint=counter;
+	counter++;
+	setLastInt(lastint);
+	return lastint;
+    }
 
-   /**
-    * Generate the next string in the distribution, skewed Zipfian favoring the items most recently returned by the basis generator.
-    */
-   public int nextInt() {
-      int max = Integer.parseInt(_basis.lastString());
-      int nextint = max - _zipfian.nextInt(max);
-      setLastInt(nextint);
-      return nextint;
-   }
-
-   public static void main(String[] args) {
-      SkewedLatestGenerator gen = new SkewedLatestGenerator(new CounterGenerator(1000));
-      for (int i = 0; i < Integer.parseInt(args[0]); i++) {
-         System.out.println(gen.nextString());
-      }
-
-   }
-
-   @Override
-   public double mean() {
-      throw new UnsupportedOperationException("Can't compute mean of non-stationary distribution!");
-   }
-
+    @Override
+    public double mean() {
+	throw new UnsupportedOperationException("Can't compute mean of non-stationary distribution!");
+    }
 }
