@@ -27,6 +27,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
    private e_gen generator = null;
    private double zipf_const = .99D;
    private int numWrites = 1;
+   private int dzipf_groups = 0;
 
 
    @Override
@@ -220,6 +221,13 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
             return new SkewedLatestGenerator(new CounterGenerator(recordCount), zipf_const);
          case ZIPF:
             return new ZipfianGenerator(recordCount, zipf_const);
+         case D_ZIPF: {
+            if (dzipf_groups == 0)
+               throw new IllegalArgumentException("DZIPF generator but no groups specified!");
+            if (dzipf_groups < cacheWrapper.getNumMembers())
+               throw new IllegalArgumentException("Number of groups is smaller than number of nodes!");
+            return new DZipfianGenerator(recordCount, dzipf_groups);
+         }
          default:
             throw new IllegalArgumentException(this.generator + " is not a valid generator. Valid values are " + Arrays.toString(e_gen.values()));
       }
@@ -227,7 +235,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
    }
 
    private enum e_gen {
-      UNIFORM, ZIPF, SKEWED_LAST
+      UNIFORM, ZIPF, SKEWED_LAST, D_ZIPF
    }
 
 }
