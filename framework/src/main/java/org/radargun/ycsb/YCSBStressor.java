@@ -58,7 +58,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
          return new Read(keynum);
       } else {
          if (ig != null) {
-            return new RMW_IG(keynum, Math.abs(r.nextInt() % numWrites), multiplereadcount, recordCount, allowBlindWrites, ig);
+            return new RMW_IG(keynum, Math.abs(r.nextInt() % numWrites), numWrites, multiplereadcount, recordCount, allowBlindWrites, ig);
          }
          return new RMW(keynum, Math.abs(r.nextInt()), multiplereadcount, recordCount, allowBlindWrites);
       }
