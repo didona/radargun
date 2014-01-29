@@ -30,6 +30,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
    private CacheWrapper cacheWrapper;
    private int multiplereadcount;
    private int recordCount;
+   protected long statsSamplingInterval = 0L;
 
 
    private int numWrites = 1;
@@ -180,6 +181,14 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
       this.retryMode = XACT_RETRY.valueOf(retryMode);
       if (this.retryMode == XACT_RETRY.RETRY_SAME_XACT)
          throw new IllegalArgumentException(this.retryMode + " not supported yet");
+   }
+
+   public long getStatsSamplingInterval() {
+      return statsSamplingInterval;
+   }
+
+   public void setStatsSamplingInterval(long statsSamplingInterval) {
+      this.statsSamplingInterval = statsSamplingInterval;
    }
 
    /**

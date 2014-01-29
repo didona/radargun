@@ -4,6 +4,7 @@ import org.radargun.CacheWrapper;
 import org.radargun.DistStageAck;
 import org.radargun.stamp.vacation.VacationStressor;
 import org.radargun.state.MasterState;
+import org.radargun.utils.StatSampler;
 import org.radargun.ycsb.YCSB;
 import org.radargun.ycsb.YCSBStressor;
 import org.radargun.ycsb.generators.*;
@@ -28,6 +29,8 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
    private double zipf_const = .99D;
    private int numWrites = 1;
    private int dzipf_groups = 0;
+   protected long statsSamplingInterval = 0L;
+   protected StatSampler sampler = null;
 
 
    @Override
@@ -44,6 +47,12 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
       YCSB.init(this.readOnly, recordCount);
       ycsbStressors = new YCSBStressor[threads];
 
+      if (statsSamplingInterval > 0) {
+         sampler = new StatSampler(statsSamplingInterval);
+         log.trace("Starting sampler with samplingInterval " + statsSamplingInterval);
+         sampler.start();
+      }
+
       for (int t = 0; t < ycsbStressors.length; t++) {
 
          ycsbStressors[t] = new YCSBStressor();
@@ -51,6 +60,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
          ycsbStressors[t].setRecordCount(this.recordCount);
          ycsbStressors[t].setMultiplereadcount(this.multipleReadCount);
          ycsbStressors[t].setAllowBlindWrites(this.allowBlindWrites);
+         ycsbStressors[t].setStatsSamplingInterval(this.statsSamplingInterval);
          if (generator != null) {
             ycsbStressors[t].setIg(buildIntegerGenerator());
             ycsbStressors[t].setNumWrites(this.numWrites);
@@ -66,11 +76,18 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
             workers[t].start();
          }
          try {
+            if (statsSamplingInterval > 0) {
+               sampler = new StatSampler(statsSamplingInterval);
+               log.trace("Starting sampler with samplingInterval " + statsSamplingInterval);
+               sampler.start();
+            }
             Thread.sleep(executionTime);
          } catch (InterruptedException e) {
          }
          for (int t = 0; t < workers.length; t++) {
             ycsbStressors[t].setPhase(VacationStressor.SHUTDOWN_PHASE);
+            if (sampler != null)
+               sampler.cancel();
          }
          for (int t = 0; t < workers.length; t++) {
             workers[t].join();
@@ -94,6 +111,8 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
          results.put("NUM_KEYS", str(recordCount));
          results.put("DATA_ACCESS_PATTERN", str(generator));
          results.put("SKEW", String.valueOf(zipf_const));
+         results.put("CPU_USAGE", str(sampler != null ? sampler.getAvgCpuUsage() : "Not_Available"));
+         results.put("MEM_USAGE", str(sampler != null ? sampler.getAvgMemUsage() : "Not_Available"));
          results.putAll(cacheWrapper.getAdditionalStats());
          log.info(sizeInfo);
          result.setPayload(results);
@@ -207,6 +226,14 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
 
    public void setNumWrites(int numWrites) {
       this.numWrites = numWrites;
+   }
+
+   public long getStatsSamplingInterval() {
+      return statsSamplingInterval;
+   }
+
+   public void setStatsSamplingInterval(long statsSamplingInterval) {
+      this.statsSamplingInterval = statsSamplingInterval;
    }
 
    public void setZipf_const(double zipf_const) {
