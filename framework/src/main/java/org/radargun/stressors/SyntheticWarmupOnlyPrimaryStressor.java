@@ -9,6 +9,14 @@ import java.util.concurrent.CountDownLatch;
  */
 public class SyntheticWarmupOnlyPrimaryStressor extends PutGetStressor {
 
+   protected Object payload(Object key) {
+      return generateRandomString(sizeOfValue);
+   }
+
+   protected Object key(int nodeIndex, int threadIndex, int keyIndex) {
+      return keyGenerator.generateKey(nodeIndex, threadIndex, keyIndex);
+   }
+
    protected List<Stressor> executeOperations() throws Exception {
       List<Stressor> stressors = new ArrayList<Stressor>(numOfThreads);
       startPoint = new CountDownLatch(1);
@@ -57,6 +65,7 @@ public class SyntheticWarmupOnlyPrimaryStressor extends PutGetStressor {
    protected class WarmUpStressor extends PutGetStressor.Stressor {
       private long duration = 0;
 
+
       public WarmUpStressor(int threadIndex) {
          super(threadIndex);
       }
@@ -93,9 +102,11 @@ public class SyntheticWarmupOnlyPrimaryStressor extends PutGetStressor {
             cacheWrapper.startTransaction();
             boolean success = true;
             log.fatal("BEWARE!!! This WarmupStressor works only with contented key, since *only* the primary is populating");
+            Object key;
             try {
                for (int i = lastBase; i <= (lastBase + next - 1); i++) {
-                  cacheWrapper.put(null, keyGenerator.generateKey(nodeIndex, threadIndex, i), generateRandomString(sizeOfValue));
+                  key = key(nodeIndex, threadIndex, i);
+                  cacheWrapper.put(null, key, payload(key));
                }
             } catch (Exception e) {
                success = false;
