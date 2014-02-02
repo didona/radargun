@@ -60,7 +60,6 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
          ycsbStressors[t].setRecordCount(this.recordCount);
          ycsbStressors[t].setMultiplereadcount(this.multipleReadCount);
          ycsbStressors[t].setAllowBlindWrites(this.allowBlindWrites);
-         ycsbStressors[t].setStatsSamplingInterval(this.statsSamplingInterval);
          if (generator != null) {
             ycsbStressors[t].setIg(buildIntegerGenerator());
             ycsbStressors[t].setNumWrites(this.numWrites);
