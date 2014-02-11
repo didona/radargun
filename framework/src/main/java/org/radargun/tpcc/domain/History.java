@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author peluso@gsd.inesc-id.pt , peluso@dis.uniroma1.it
  */
-public class History extends AbstractDomainObject implements Serializable{
+public class History extends AbstractDomainObject implements Serializable {
 
    private static final AtomicLong idGenerator = new AtomicLong(0L);
 
@@ -112,14 +112,15 @@ public class History extends AbstractDomainObject implements Serializable{
       this.h_data = h_data;
    }
 
-   private static String _generateId(int slaveIndex) {
-      return String.valueOf(slaveIndex) + String.valueOf(History.idGenerator.incrementAndGet());
+   private String _generateId(int slaveIndex) {
+      return "HISTORY_" + h_w_id + "_" + String.valueOf(History.idGenerator.incrementAndGet());
+      //return String.valueOf(slaveIndex) + String.valueOf(History.idGenerator.incrementAndGet());
    }
 
    @Override
-      protected Object generateId(int slaveIndex) {
-         return _generateId(slaveIndex);  //To change body of implemented methods use File | Settings | File Templates.
-      }
+   protected Object generateId(int slaveIndex) {
+      return _generateId(slaveIndex);  //To change body of implemented methods use File | Settings | File Templates.
+   }
 
    @Override
    public void store(CacheWrapper wrapper, int slaveIndex) throws Throwable {
@@ -177,9 +178,9 @@ public class History extends AbstractDomainObject implements Serializable{
       store(wrapper, -1);
    }
 
-  protected Object getKey(){
-     throw new RuntimeException("History has no key");
-  }
+   protected Object getKey() {
+      throw new RuntimeException("History has no key");
+   }
 
    @Override
    public boolean load(CacheWrapper wrapper) throws Throwable {

@@ -27,6 +27,7 @@ public class TpccTerminal {
    private final int indexNode;
 
    private int localWarehouseID;
+   private int[] localWarehouseIDs;
 
    private final TpccTools tpccTools;
 
@@ -39,7 +40,18 @@ public class TpccTerminal {
       tpccTools = TpccTools.newInstance();
    }
 
+   public TpccTerminal(double paymentWeight, double orderStatusWeight, int indexNode, int[] localWarehouseIDs) {
+      this.paymentWeight = paymentWeight;
+      this.orderStatusWeight = orderStatusWeight;
+      this.indexNode = indexNode;
+      this.localWarehouseIDs = localWarehouseIDs;
+      tpccTools = TpccTools.newInstance();
+   }
+
    public final TpccTransaction createTransaction(int type, int threadId) {
+      if(localWarehouseIDs!=null){
+         //Select either a local warehouse or a remote one
+      }
       switch (type) {
          case PAYMENT:
             return new PaymentTransaction(tpccTools, threadId, indexNode, localWarehouseID);

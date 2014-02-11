@@ -589,12 +589,24 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
       private long numBackOffs = 0L;
       private long backedOffTime = 0L;
 
+      private int[] localWarehousesIDs;
+
       public Stressor(int localWarehouseID, int threadIndex, int nodeIndex, double arrivalRate,
                       double paymentWeight, double orderStatusWeight) {
          super("Stressor-" + threadIndex);
          this.threadIndex = threadIndex;
          this.arrivalRate = arrivalRate;
          this.terminal = new TpccTerminal(paymentWeight, orderStatusWeight, nodeIndex, localWarehouseID);
+         if (backOffTime > 0)
+            this.backOffSleeper = new ProducerRate(Math.pow((double) backOffTime, -1D));
+      }
+
+      public Stressor(int[] localWarehouseIDs, int threadIndex, int nodeIndex, double arrivalRate,
+                      double paymentWeight, double orderStatusWeight) {
+         super("Stressor-" + threadIndex);
+         this.threadIndex = threadIndex;
+         this.arrivalRate = arrivalRate;
+         this.terminal = new TpccTerminal(paymentWeight, orderStatusWeight, nodeIndex, localWarehouseIDs);
          if (backOffTime > 0)
             this.backOffSleeper = new ProducerRate(Math.pow((double) backOffTime, -1D));
       }

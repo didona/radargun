@@ -129,13 +129,19 @@ public class TpccBenchmarkStage extends AbstractDistStage {
    }
 
    //If in subsequent runs I want to sue different methods, I have to ensure that only one is active
+   @Deprecated
    private void trackNewKeys() {
+      log.fatal("NB: trackNewKeys is disabled.");
+      cacheWrapper.setTrackNewKeys(false);
+      cacheWrapper.setPerThreadTrackNewKeys(false);
+      /*
       if (trackNewKeys && perThreadTrackNewKeys)
          throw new IllegalArgumentException("trackNewKeys and perThreadTrackNewKeys should be mutually exclusive (at least for now)");
       this.cacheWrapper.setPerThreadTrackNewKeys(false);
       this.cacheWrapper.setTrackNewKeys(false);
       cacheWrapper.setTrackNewKeys(trackNewKeys);
       cacheWrapper.setPerThreadTrackNewKeys(perThreadTrackNewKeys);
+      */
    }
 
    public DistStageAck executeOnSlave() {
@@ -267,7 +273,7 @@ public class TpccBenchmarkStage extends AbstractDistStage {
       this.perThreadTrackNewKeys = trackNewKeys;
    }
 
-   public void setRetrySameXact(boolean b){
+   public void setRetrySameXact(boolean b) {
       this.retrySameXact = b;
    }
 
