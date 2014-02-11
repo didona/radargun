@@ -93,7 +93,7 @@ public class PutGetStressor extends AbstractCacheWrapperStressor {
       if (statsSamplingInterval > 0) {
          sampler = new StatSampler(statsSamplingInterval);
          log.trace("Starting sampler with samplingInterval " + statsSamplingInterval);
-         sampler.start();
+         sampler.startAfterInterval();
       }
       List<Stressor> stressors;
       try {

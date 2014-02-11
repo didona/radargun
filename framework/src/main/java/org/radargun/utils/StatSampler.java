@@ -62,15 +62,24 @@ public class StatSampler {
     * cancels the current timer task
     */
    public final void cancel() {
-      if(log.isTraceEnabled()) log.trace("Cancel timer task");
+      if (log.isTraceEnabled()) log.trace("Cancel timer task");
       timer.cancel();
    }
 
    /**
     * start a timer task.
     */
-   public final void start() {
-      if(log.isTraceEnabled()) log.trace("Start timer task");
+   public final void startAfterInterval() {
+      if (log.isTraceEnabled())
+         log.trace("Starting timer timer task. It will be fired the first time after " + interval + " msec");
+      timer.schedule(new Collector(), interval, interval);
+   }
+
+   /**
+    * start a timer task.
+    */
+   public final void startNow() {
+      if (log.isTraceEnabled()) log.trace("Start timer task");
       timer.schedule(new Collector(), 0, interval);
    }
 
@@ -78,7 +87,7 @@ public class StatSampler {
     * reset the samples
     */
    public final void reset() {
-      if(log.isTraceEnabled()) log.trace("Reset samples collected");
+      if (log.isTraceEnabled()) log.trace("Reset samples collected");
       usedMemories.clear();
       usedCpu.clear();
    }
@@ -105,7 +114,8 @@ public class StatSampler {
       public void run() {
          double cpuValue = cpu.getCpuUsageAndReset();
          long memValue = memory.getUsedMemory();
-         if(log.isTraceEnabled()) log.trace("Collecting memory and cpu usage. Memory usage is " + memValue + " and CPU usage is " + cpuValue);
+         if (log.isTraceEnabled())
+            log.trace("Collecting memory and cpu usage. Memory usage is " + memValue + " and CPU usage is " + cpuValue);
          if (!Double.isNaN(cpuValue))
             usedCpu.addLast(cpuValue);
          usedMemories.addLast(memValue);

@@ -183,7 +183,7 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
             }
          }
          if (statSampler != null) {
-            statSampler.start();
+            statSampler.startAfterInterval();
          }
          executeOperations();
       } catch (Exception e) {

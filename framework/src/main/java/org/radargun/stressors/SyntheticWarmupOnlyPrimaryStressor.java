@@ -86,6 +86,7 @@ public class SyntheticWarmupOnlyPrimaryStressor extends PutGetStressor {
       }
 
       private void runInternal() {
+         final boolean trace = log.isTraceEnabled();
          try {
             startPoint.await();
             log.trace("Starting thread: " + getName());
@@ -96,14 +97,16 @@ public class SyntheticWarmupOnlyPrimaryStressor extends PutGetStressor {
          int remaining = keysPerThread(numOfThreads, threadIndex);
          int lastBase = baseKey(threadIndex, numOfThreads);
          log.debug("ThreadIndex " + threadIndex + " base = " + lastBase);
+         log.fatal("BEWARE!!! This WarmupStressor works only with contented key, since *only* the primary is populating");
          while (remaining > 0) {
             int next = keyPerXact(remaining);
             log.debug(threadIndex + " Going to insert keys from " + lastBase + " to " + (lastBase + next - 1));
             cacheWrapper.startTransaction();
             boolean success = true;
-            log.fatal("BEWARE!!! This WarmupStressor works only with contented key, since *only* the primary is populating");
             Object key;
             try {
+               if (trace)
+                  log.trace("Going to put from " + lastBase + " to " + (lastBase + next - 1));
                for (int i = lastBase; i <= (lastBase + next - 1); i++) {
                   key = key(nodeIndex, threadIndex, i);
                   cacheWrapper.put(null, key, payload(key));

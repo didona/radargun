@@ -47,12 +47,6 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
       YCSB.init(this.readOnly, recordCount);
       ycsbStressors = new YCSBStressor[threads];
 
-      if (statsSamplingInterval > 0) {
-         sampler = new StatSampler(statsSamplingInterval);
-         log.trace("Starting sampler with samplingInterval " + statsSamplingInterval);
-         sampler.start();
-      }
-
       for (int t = 0; t < ycsbStressors.length; t++) {
 
          ycsbStressors[t] = new YCSBStressor();
@@ -78,7 +72,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
             if (statsSamplingInterval > 0) {
                sampler = new StatSampler(statsSamplingInterval);
                log.trace("Starting sampler with samplingInterval " + statsSamplingInterval);
-               sampler.start();
+               sampler.startAfterInterval();
             }
             Thread.sleep(executionTime);
          } catch (InterruptedException e) {
