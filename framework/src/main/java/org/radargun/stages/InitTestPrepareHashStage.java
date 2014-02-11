@@ -8,6 +8,7 @@ import org.radargun.DistStageAck;
  * @author diego
  * @since 4.0
  */
+@Deprecated
 public class InitTestPrepareHashStage extends AbstractDistStage {
    private int numKeys;
 

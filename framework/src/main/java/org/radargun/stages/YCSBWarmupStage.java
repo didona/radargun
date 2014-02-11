@@ -14,8 +14,12 @@ import java.util.Map;
 public class YCSBWarmupStage extends SyntheticWarmupStage {
 
    protected Map<String, String> doWork() {
-      log.trace("Pre-initing YCSB");
+      log.fatal("Pre-initing YCSB. ALSO on the slaves!");
       YCSB.preinit();
+      if (!cacheWrapper.isCoordinator()) {
+         log.fatal("I am a slave, thus I do not populate. Bye");
+         return null;
+      }
       log.info("Starting " + getClass().getSimpleName() + ": " + this);
       YCSBWarmupOnlyPrimaryStressor putGetStressor = new YCSBWarmupOnlyPrimaryStressor();
       putGetStressor.setNodeIndex(getSlaveIndex());

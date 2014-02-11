@@ -30,6 +30,7 @@ public class TpccTerminal {
    private int[] localWarehouseIDs;
 
    private final TpccTools tpccTools;
+   private final int locality;
 
 
    public TpccTerminal(double paymentWeight, double orderStatusWeight, int indexNode, int localWarehouseID) {
@@ -38,19 +39,52 @@ public class TpccTerminal {
       this.indexNode = indexNode;
       this.localWarehouseID = localWarehouseID;
       tpccTools = TpccTools.newInstance();
+      this.locality = -1;
    }
 
-   public TpccTerminal(double paymentWeight, double orderStatusWeight, int indexNode, int[] localWarehouseIDs) {
+   public TpccTerminal(double paymentWeight, double orderStatusWeight, int indexNode, int[] localWarehouseIDs, int locality) {
       this.paymentWeight = paymentWeight;
       this.orderStatusWeight = orderStatusWeight;
       this.indexNode = indexNode;
       this.localWarehouseIDs = localWarehouseIDs;
       tpccTools = TpccTools.newInstance();
+      this.locality = locality;
+   }
+
+   /**
+    * Checks whether a given warehouse is local or not
+    * @param w
+    * @return
+    */
+   private boolean containsW(int w) {
+      for (int i : localWarehouseIDs)
+         if (i == w)
+            return true;
+      return false;
+   }
+
+   //NB: if all the warehouses are on the same node this will loop forever
+   //TODO to fix
+   private int nonLocalWarehouse() {
+      int localWarehouseID;
+      do {
+         localWarehouseID = (int) tpccTools.randomNumber(1, TpccTools.NB_WAREHOUSES);
+      }
+      while (containsW(localWarehouseID));
+      return localWarehouseID;
    }
 
    public final TpccTransaction createTransaction(int type, int threadId) {
-      if(localWarehouseIDs!=null){
-         //Select either a local warehouse or a remote one
+      int localWarehouseID = this.localWarehouseID;
+      if (localWarehouseIDs != null) {
+         //Determine whether you have to access a local warehouse
+         boolean local = tpccTools.randomNumber(1, 100) <= locality;
+         //Select a random NOT LOCAL
+         if (!local)
+            localWarehouseID = nonLocalWarehouse();
+         //Select a local warehouse
+         else
+            localWarehouseID = (int) tpccTools.randomNumber(localWarehouseIDs[0], localWarehouseIDs[localWarehouseIDs.length - 1]);
       }
       switch (type) {
          case PAYMENT:

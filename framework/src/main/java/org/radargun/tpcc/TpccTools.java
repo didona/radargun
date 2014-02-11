@@ -204,6 +204,7 @@ public final class TpccTools {
       return (((randomNumberForNonUniform(0, x) | randomNumberForNonUniform(min, max)) + type) % (max - min + 1)) + min;
    }
 
+   //Note: this has to match the relevant locality function
    public static void selectLocalWarehouse(int numberOfSlaves, int slaveIdx, List<Integer> localWarehousesList) {
       int init = slaveIdx % NB_WAREHOUSES;
 

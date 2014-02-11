@@ -81,6 +81,11 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
    private boolean accessSameWarehouse = false;
 
    /**
+    * If greater than 0, then with "locality" prob, a thread will access a local xact
+    */
+   private int locality = 0;
+
+   /**
     * specify the min and the max number of items created by a New Order Transaction.
     * format: min,max
     */
@@ -606,7 +611,7 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
          super("Stressor-" + threadIndex);
          this.threadIndex = threadIndex;
          this.arrivalRate = arrivalRate;
-         this.terminal = new TpccTerminal(paymentWeight, orderStatusWeight, nodeIndex, localWarehouseIDs);
+         this.terminal = new TpccTerminal(paymentWeight, orderStatusWeight, nodeIndex, localWarehouseIDs, locality);
          if (backOffTime > 0)
             this.backOffSleeper = new ProducerRate(Math.pow((double) backOffTime, -1D));
       }
@@ -1070,14 +1075,32 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
       return count;
    }
 
+   /**
+    * Given the number of local warehouses, assign in a modular fashion ONE warehouse to each thread
+    * If there are not local warehouses, the local id will be -1 and the terminal itself will generate
+    * randomly accessed warehouses
+    */
 
    private Stressor createStressor(int threadIndex) {
-      int localWarehouse = getWarehouseForThread(threadIndex);
-      return new Stressor(localWarehouse, threadIndex, nodeIndex, arrivalRate, paymentWeight, orderStatusWeight);
+      //if accessSameWarehouse, then the local wh are there. Otherwise, the localW is -1 and the terminal
+      //will behave with no locality
+      if (accessSameWarehouse || locality == 0) {
+         int localWarehouse = getWarehouseForThread(threadIndex);
+         return new Stressor(localWarehouse, threadIndex, nodeIndex, arrivalRate, paymentWeight, orderStatusWeight);
+      } else {
+         int[] local = new int[listLocalWarehouses.size()];
+         for (int i = 0; i < local.length; i++) {
+            local[i] = listLocalWarehouses.get(i);
+         }
+         return new Stressor(local, threadIndex, nodeIndex, arrivalRate, paymentWeight, orderStatusWeight);
+      }
    }
 
+   /**
+    * Each slave is given a number of warehouses if accessSameWarehouse is enabled
+    */
    private void calculateLocalWarehouses() {
-      if (accessSameWarehouse) {
+      if (accessSameWarehouse || locality > 0) {
          TpccTools.selectLocalWarehouse(numSlaves, nodeIndex, listLocalWarehouses);
          if (log.isDebugEnabled()) {
             log.debug("Find the local warehouses. Number of Warehouses=" + TpccTools.NB_WAREHOUSES + ", number of slaves=" +
@@ -1085,7 +1108,7 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
          }
       } else {
          if (log.isDebugEnabled()) {
-            log.debug("Local warehouses are disabled. Choose a random warehouse in each transaction");
+            log.debug("AccessSameWarehouses is false AND locality = 0. Choose a random warehouse in each transaction");
          }
       }
    }
@@ -1182,6 +1205,9 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
       finishBenchmark();
    }
 
+   public void setLocality(int locality) {
+      this.locality = locality;
+   }
 
    private String testIdString(long payment, long orderStatus, long threads) {
       return threads + "T_" + payment + "PA_" + orderStatus + "OS";

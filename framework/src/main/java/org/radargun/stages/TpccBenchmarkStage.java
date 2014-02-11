@@ -85,6 +85,8 @@ public class TpccBenchmarkStage extends AbstractDistStage {
     */
    private long backOffTime = 0;
 
+   private int locality = 0;
+
    /**
     * If true, a transaction t is regenerated until it commits, unless it throws a "NotSuchElementException"
     * In this case, the transaction is aborted for good.
@@ -169,6 +171,7 @@ public class TpccBenchmarkStage extends AbstractDistStage {
       tpccStressor.setBackOffTime(backOffTime);
       tpccStressor.setRetryOnAbort(retryOnAbort);
       tpccStressor.setRetrySameXact(retrySameXact);
+      tpccStressor.setLocality(locality);
 
       AbstractTpccTransaction.setAvoidNotFoundExceptions(this.avoidMiss);
 
@@ -275,6 +278,10 @@ public class TpccBenchmarkStage extends AbstractDistStage {
 
    public void setRetrySameXact(boolean b) {
       this.retrySameXact = b;
+   }
+
+   public void setLocality(int locality) {
+      this.locality = locality;
    }
 
    @Override

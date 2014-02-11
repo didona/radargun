@@ -1,5 +1,7 @@
 package org.radargun.ycsb.transaction;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
 import org.radargun.stressors.ContentionYCSBStringKeyGenerator;
 import org.radargun.ycsb.ByteIterator;
@@ -22,6 +24,8 @@ public class RMW_IG extends RMW {
    private IntegerGenerator integerGenerator;
    private int numWrites;
    private ContentionYCSBStringKeyGenerator generator = new ContentionYCSBStringKeyGenerator();
+   private final static Log log = LogFactory.getLog(RMW_IG.class);
+   private final static boolean trace = log.isTraceEnabled();
 
    public RMW_IG(int k, int random, int multiplereadcount, int numW, int recordCount, boolean blindWrites, IntegerGenerator integerGenerator) {
       super(k, random, multiplereadcount, recordCount, blindWrites);
@@ -30,12 +34,18 @@ public class RMW_IG extends RMW {
    }
 
    @Override
+   //TODO: we may choose to write different things for different put operations
    public void executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
       HashMap<String, ByteIterator> values = new HashMap<String, ByteIterator>();
-
+      int temp;
       for (int i = 0; i < YCSB.fieldcount; i++) {
          String fieldkey = "field" + i;
-         ByteIterator data = new RandomByteIterator(YCSB.fieldlengthgenerator.nextInt());
+         if (trace)
+            log.trace("FieldKey " + fieldkey);
+         temp = YCSB.fieldlengthgenerator.nextInt();
+         if (trace)
+            log.trace("length " + temp);
+         ByteIterator data = new RandomByteIterator(temp);
          values.put(fieldkey, data);
       }
 
@@ -61,10 +71,16 @@ public class RMW_IG extends RMW {
          if (toWriteB) {
             //If we do not want blind writes, then we have to read the user and then write to it
             if (!blindWrites) {
+               if (trace)
+                  log.trace("Read " + key);
                cacheWrapper.get(null, key);
             }
+            if (trace)
+               log.trace("Put " + key);
             cacheWrapper.put(null, key, row);
          } else {
+            if (trace)
+               log.trace("Read " + key);
             cacheWrapper.get(null, key);
          }
       }
