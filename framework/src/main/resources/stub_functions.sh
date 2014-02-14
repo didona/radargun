@@ -171,4 +171,7 @@ function change_readOnly(){
 sed -i "s/READO/$1/g" ${bench}
 }
 
+function change_item_size(){
+sed -i "s/ASIZE/${1}/g" ${bench}
+}
 
