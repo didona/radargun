@@ -12,13 +12,13 @@ public class Item extends AbstractDomainObject implements Serializable {
 
    private long i_id;
 
-   private long i_im_id;
+   protected long i_im_id;
 
-   private String i_name;
+   protected String i_name;
 
-   private double i_price;
+   protected double i_price;
 
-   private String i_data;
+   protected String i_data;
 
    public Item() {
 

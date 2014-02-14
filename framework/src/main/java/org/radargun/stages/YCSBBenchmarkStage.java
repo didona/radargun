@@ -246,7 +246,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
                throw new IllegalArgumentException("DZIPF generator but no groups specified!");
             if (dzipf_groups < cacheWrapper.getNumMembers())
                throw new IllegalArgumentException("Number of groups is smaller than number of nodes!");
-            return new DZipfianGenerator(recordCount, dzipf_groups);
+            return new DZipfianGenerator(recordCount, zipf_const, dzipf_groups);
          }
          default:
             throw new IllegalArgumentException(this.generator + " is not a valid generator. Valid values are " + Arrays.toString(e_gen.values()));

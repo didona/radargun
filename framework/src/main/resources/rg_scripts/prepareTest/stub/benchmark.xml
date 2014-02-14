@@ -10,7 +10,7 @@
         <CacheSize statName="Before"/>
       <GarbageCollection/>
       <ResetStats/>
-      <SyntheticPrepareTestBenchmark sizeOfAnAttribute="1000" keyGeneratorClass="org.radargun.stressors.TestPrepareContentionStringKeyGenerator" numberOfAttributes="NKEYS" numOfThreads="1" updateXactWrites="NUMW" updateXactReads="NUMWR" readOnlyXactSize="NUMR" writePercentage="WRITEP" allowBlindWrites="true" duration="300000" retryMode="RETRY_SAME_CLASS" statsSamplingInterval="25000" readsBeforeFirstWrite="0" sampleNTCBServiceTime="true" precomputeRWset="false" masterOnlyWrites="true" numRemoteNodesToContact="REMOTEN" onlyOneWriter="true"/>
+      <SyntheticPrepareTestBenchmark sizeOfAnAttribute="1000" keyGeneratorClass="org.radargun.stressors.TestPrepareContentionStringKeyGenerator" numberOfAttributes="NKEYS" numOfThreads="1" updateXactWrites="NUMW" updateXactReads="NUMWR" readOnlyXactSize="NUMR" writePercentage="WRITEP" allowBlindWrites="true" duration="300000" retryMode="RETRY_SAME_CLASS" statsSamplingInterval="25000" readsBeforeFirstWrite="0" sampleNTCBServiceTime="true" precomputeRWset="false" PBMasterOnlyWrites="true" numRemoteNodesToContact="REMOTEN" onlyOneWorker="true"/>
       <CacheSize statName="After"/>
 	<DumpHistogram/>
         <CsvReportGeneration/>

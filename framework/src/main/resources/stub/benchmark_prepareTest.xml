@@ -13,7 +13,7 @@
       <ResetStats/>
       <SyntheticPrepareTestBenchmark sizeOfAnAttribute="1000" keyGeneratorClass="org.radargun.stressors.TestPrepareContentionStringKeyGenerator" numberOfAttributes="NKEYS" numOfThre
 ads="1" updateXactWrites="NUMW" updateXactReads="NUMWR" readOnlyXactSize="NUMR" writePercentage="WRITEP" allowBlindWrites="true" duration="90000" retryMode="RETRY_SAME_CLASS" statsS
-amplingInterval="25000" readsBeforeFirstWrite="0" sampleNTCBServiceTime="true" precomputeRWset="false" masterOnlyWrites="true" numRemoteNodesToContact="3"/>
+amplingInterval="25000" readsBeforeFirstWrite="0" sampleNTCBServiceTime="true" precomputeRWset="false" PBMasterOnlyWrites="true" numRemoteNodesToContact="3"/>
       <CacheSize statName="After"/>
         <DumpHistogram/>
         <CsvReportGeneration/>

@@ -72,6 +72,12 @@ public class NewOrderTransaction extends AbstractTpccTransaction {
       return false;
    }
 
+   protected Item createItem(long id, long w_id) {
+      Item i = new Item();
+      i.setI_id(id);
+      return i;
+   }
+
    private void newOrderTransaction(CacheWrapper cacheWrapper) throws Throwable {
       long o_id = -1, s_quantity;
       String i_data, s_data;
@@ -120,16 +126,16 @@ public class NewOrderTransaction extends AbstractTpccTransaction {
 
       NewOrder no = new NewOrder(o_id, districtID, warehouseID);
 
-      no.threadAwareStore(cacheWrapper,threadId);
+      no.threadAwareStore(cacheWrapper, threadId);
 
       d.setD_next_o_id(d.getD_next_o_id() + 1);
 
-      d.threadAwareStore(cacheWrapper,threadId);
+      d.threadAwareStore(cacheWrapper, threadId);
 
 
       Order o = new Order(o_id, districtID, warehouseID, customerID, new Date(), -1, numItems, allLocal);
 
-      o.threadAwareStore(cacheWrapper,threadId);
+      o.threadAwareStore(cacheWrapper, threadId);
 
 
       // see clause 2.4.2.2 (dot 8)
@@ -139,8 +145,9 @@ public class NewOrderTransaction extends AbstractTpccTransaction {
          ol_quantity = orderQuantities[ol_number - 1];
 
          // clause 2.4.2.2 (dot 8.1)
-         Item i = new Item();
-         i.setI_id(ol_i_id);
+         Item i = createItem(ol_i_id, ol_supply_w_id);
+         //Item i = new Item();
+         //i.setI_id(ol_i_id);
          found = i.load(cacheWrapper);
          if (!found) throw new ElementNotFoundException("I_ID=" + ol_i_id + " not found!");
 
@@ -175,7 +182,7 @@ public class NewOrderTransaction extends AbstractTpccTransaction {
          s.setS_ytd(s.getS_ytd() + ol_quantity);
          s.setS_remote_cnt(s.getS_remote_cnt() + s_remote_cnt_increment);
          s.setS_order_cnt(s.getS_order_cnt() + 1);
-         s.threadAwareStore(cacheWrapper,threadId);
+         s.threadAwareStore(cacheWrapper, threadId);
 
 
          // clause 2.4.2.2 (dot 8.3)
@@ -227,7 +234,7 @@ public class NewOrderTransaction extends AbstractTpccTransaction {
 
          OrderLine ol = new OrderLine(o_id, districtID, warehouseID, ol_number, ol_i_id, ol_supply_w_id, null,
                  ol_quantity, ol_amount, ol_dist_info);
-         ol.threadAwareStore(cacheWrapper,threadId);
+         ol.threadAwareStore(cacheWrapper, threadId);
       }
 
    }

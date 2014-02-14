@@ -340,9 +340,9 @@ public class ThreadParallelTpccPopulation extends TpccPopulation {
 
    protected class PopulateItemThread extends Thread {
 
-      private long lowerBound;
-      private long upperBound;
-      private final int threadIdx;
+      protected long lowerBound;
+      protected long upperBound;
+      protected final int threadIdx;
 
       @Override
       public String toString() {

@@ -37,10 +37,13 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
    private boolean allowBlindWrites = false;
    private XACT_RETRY retryMode = XACT_RETRY.NO_RETRY;
    protected int readsBeforeFirstWrite = 1;
-   private boolean masterOnlyWrites = false;
+   //If true, in PB the master only does update xacts
+   private boolean PBMasterOnlyWrites = false;
    private boolean precomputeRWset = false;
    private boolean sampleNTCBServiceTime = false;
    private long spinBetweenOps = 0L;
+   //If true, only the primary will work
+   protected boolean onlyOneWorker;
 
    protected SyntheticPutGetStressor buildPutGetStressor() {
       return new SyntheticPutGetStressor();
@@ -64,9 +67,10 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
       putGetStressor.setStatsSamplingInterval(statsSamplingInterval);
       putGetStressor.setXact_retry(retryMode);
       putGetStressor.setReadsBeforeFirstWrite(readsBeforeFirstWrite);
-      putGetStressor.setMasterOnlyWrites(masterOnlyWrites);
+      putGetStressor.setMasterOnlyWrites(PBMasterOnlyWrites);
       putGetStressor.setSampleNTCBServiceTime(sampleNTCBServiceTime);
       putGetStressor.setPrecomputeRWset(precomputeRWset);
+      putGetStressor.setOnlyOneWorker(onlyOneWorker);
    }
 
    protected Map<String, String> doWork() {
@@ -134,16 +138,20 @@ public class SyntheticBenchmarkStage extends WebSessionBenchmarkStage {
       this.retryMode = XACT_RETRY.valueOf(retry);
    }
 
-   public boolean isMasterOnlyWrites() {
-      return masterOnlyWrites;
+   public boolean isPBMasterOnlyWrites() {
+      return PBMasterOnlyWrites;
    }
 
-   public void setMasterOnlyWrites(String masterOnlyWrites) {
-      this.masterOnlyWrites = Boolean.valueOf(masterOnlyWrites);
+   public void setPBMasterOnlyWrites(String PBMasterOnlyWrites) {
+      this.PBMasterOnlyWrites = Boolean.valueOf(PBMasterOnlyWrites);
    }
 
    public void setSpinBetweenOps(long spinBetweenOps) {
       this.spinBetweenOps = spinBetweenOps;
+   }
+
+   public void setOnlyOneWorker(String onlyOneWorker) {
+      this.onlyOneWorker = Boolean.valueOf(onlyOneWorker);
    }
 
    @Override

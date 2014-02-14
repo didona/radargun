@@ -23,8 +23,8 @@ public class DZipfianGenerator extends ZipfianGenerator {
    private int groups;
    private final static Log log = LogFactory.getLog(DZipfianGenerator.class);
 
-   public DZipfianGenerator(long _items, long _groups) {
-      super(_items / _groups);//this sets the item variable
+   public DZipfianGenerator(long _items, double zipf, long _groups) {
+      super(_items / _groups, zipf);//this sets the item variable
       groups = (int) _groups;
       r = new Random();
       if (log.isTraceEnabled())

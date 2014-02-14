@@ -53,6 +53,7 @@ public class SyntheticPutGetStressor extends PutGetStressor {
    private boolean sampleNTCBServiceTime = false;
 
    private long spinBetweenOps = 0L;
+   private boolean onlyOneWorker;
 
 
    public int getReadsBeforeFirstWrite() {
@@ -274,6 +275,10 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       }
 
       protected void runInternal() {
+         if (onlyOneWorker && !cacheWrapper.isCoordinator()) {
+            log.fatal("Only one worker and I am not the coordinator.Returning");
+            return;
+         }
          result outcome;
          SyntheticXact last = null;
          try {
@@ -438,6 +443,9 @@ public class SyntheticPutGetStressor extends PutGetStressor {
       }
    }
 
+   public void setOnlyOneWorker(boolean onlyOneWorker) {
+      this.onlyOneWorker = onlyOneWorker;
+   }
 
    private enum result {
       AB_L, AB_R, COM, OTHER

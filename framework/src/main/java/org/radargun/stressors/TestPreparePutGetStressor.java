@@ -64,11 +64,6 @@ public class TestPreparePutGetStressor extends SyntheticPutGetStressor {
             log.trace(perThreadKeyGen);
       }
 
-      protected void runInternal() {
-         if (onlyOneWriter && !cacheWrapper.isCoordinator())
-            return;
-         super.runInternal();
-      }
 
       protected void initFactory() {
          if (onePutMultipleOwners)

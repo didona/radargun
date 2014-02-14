@@ -12,15 +12,11 @@ import org.radargun.stressors.TestPreparePutGetStressor;
 public class SyntheticPrepareTestBenchmarkStage extends SyntheticBenchmarkStage {
 
    private int numRemoteNodesToContact;
-   private boolean onlyOneWriter;
+
    private boolean onePutMultipleOwners;
 
    public void setOnePutMultipleOwners(String onePutMultipleOwners) {
       this.onePutMultipleOwners = Boolean.valueOf(onePutMultipleOwners);
-   }
-
-   public void setOnlyOneWriter(String onlyOneWriter) {
-      this.onlyOneWriter = Boolean.valueOf(onlyOneWriter);
    }
 
    public int getNumRemoteNodesToContact() {
@@ -39,7 +35,7 @@ public class SyntheticPrepareTestBenchmarkStage extends SyntheticBenchmarkStage 
    protected void initPutGetStressor(SyntheticPutGetStressor putGetStressor) {
       super.initPutGetStressor(putGetStressor);
       ((TestPreparePutGetStressor) putGetStressor).setNumRemoteNodeToContact(numRemoteNodesToContact);
-      ((TestPreparePutGetStressor) putGetStressor).setOnlyOneWriter(this.onlyOneWriter);
+      ((TestPreparePutGetStressor) putGetStressor).setOnlyOneWriter(this.onlyOneWorker);
       ((TestPreparePutGetStressor) putGetStressor).setOnePutMultipleOwners(this.onePutMultipleOwners);
    }
 }
