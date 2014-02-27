@@ -7,9 +7,19 @@ import org.radargun.state.MasterState;
 import org.radargun.utils.StatSampler;
 import org.radargun.ycsb.YCSB;
 import org.radargun.ycsb.YCSBStressor;
-import org.radargun.ycsb.generators.*;
+import org.radargun.ycsb.generators.CounterGenerator;
+import org.radargun.ycsb.generators.DZipfianGenerator;
+import org.radargun.ycsb.generators.IntegerGenerator;
+import org.radargun.ycsb.generators.SkewedLatestGenerator;
+import org.radargun.ycsb.generators.UniformIntegerGenerator;
+import org.radargun.ycsb.generators.ZipfianGenerator;
+import org.radargun.ycsb.transaction.diego.D_YCSBStressor;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class YCSBBenchmarkStage extends AbstractDistStage {
 
@@ -32,6 +42,15 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
    protected long statsSamplingInterval = 0L;
    protected StatSampler sampler = null;
 
+   private String workload = null; //If != null I will use the workload based stressor
+
+
+   private YCSBStressor buildYCSBSTressor() {
+      if (workload == null)
+         return new YCSBStressor();
+      else
+         return new D_YCSBStressor(workload);
+   }
 
    @Override
    public DistStageAck executeOnSlave() {
@@ -49,7 +68,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
 
       for (int t = 0; t < ycsbStressors.length; t++) {
 
-         ycsbStressors[t] = new YCSBStressor();
+         ycsbStressors[t] = buildYCSBSTressor();
          ycsbStressors[t].setCacheWrapper(cacheWrapper);
          ycsbStressors[t].setRecordCount(this.recordCount);
          ycsbStressors[t].setMultiplereadcount(this.multipleReadCount);
@@ -87,9 +106,9 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
          }
          Map<String, String> results = new LinkedHashMap<String, String>();
          String sizeInfo = "size info: " + cacheWrapper.getInfo() +
-                 ", clusterSize:" + super.getActiveSlaveCount() +
-                 ", nodeIndex:" + super.getSlaveIndex() +
-                 ", cacheSize: " + cacheWrapper.getCacheSize();
+               ", clusterSize:" + super.getActiveSlaveCount() +
+               ", nodeIndex:" + super.getSlaveIndex() +
+               ", cacheSize: " + cacheWrapper.getCacheSize();
          results.put(SIZE_INFO, sizeInfo);
          long aborts = 0L;
          long throughput = 0L;
@@ -231,6 +250,14 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
 
    public void setZipf_const(double zipf_const) {
       this.zipf_const = zipf_const;
+   }
+
+   public String getWorkload() {
+      return workload;
+   }
+
+   public void setWorkload(String workload) {
+      this.workload = workload;
    }
 
    private IntegerGenerator buildIntegerGenerator() {

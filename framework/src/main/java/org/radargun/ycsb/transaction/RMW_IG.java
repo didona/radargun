@@ -21,11 +21,16 @@ import java.util.Map;
  */
 public class RMW_IG extends RMW {
 
+   //TODO: I just noticed I only create the row to write once, instead that on a per-put basis...too bad
+
    private IntegerGenerator integerGenerator;
    private int numWrites;
    private ContentionYCSBStringKeyGenerator generator = new ContentionYCSBStringKeyGenerator();
    private final static Log log = LogFactory.getLog(RMW_IG.class);
    private final static boolean trace = log.isTraceEnabled();
+   private final Map<Integer, Object> alreadyRead = new HashMap<Integer, Object>();
+   private final Map<Integer, Object> alreadyWritten = new HashMap<Integer, Object>();
+   private final static boolean avoidRepetition = true;
 
    public RMW_IG(int k, int random, int multiplereadcount, int numW, int recordCount, boolean blindWrites, IntegerGenerator integerGenerator) {
       super(k, random, multiplereadcount, recordCount, blindWrites);
@@ -36,6 +41,19 @@ public class RMW_IG extends RMW {
    @Override
    //TODO: we may choose to write different things for different put operations
    public void executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
+      //read-write xact
+      if (multiplereadcount != 0) {
+         executeReadWrite(cacheWrapper);
+      } else {    //Update only xact
+         executeWriteOnly(cacheWrapper);
+      }
+   }
+
+   /**
+    * Execute a xact with numReads > numWrites I am still assuming no blind writes here, just for the semplicity of the
+    * code
+    */
+   private void executeReadWrite(CacheWrapper cacheWrapper) throws Throwable {
       HashMap<String, ByteIterator> values = new HashMap<String, ByteIterator>();
       int temp;
       for (int i = 0; i < YCSB.fieldcount; i++) {
@@ -50,6 +68,7 @@ public class RMW_IG extends RMW {
       }
 
       Map<String, String> row = StringByteIterator.getStringMap(values);
+
       //int toWrite = (Math.abs(random)) % multiplereadcount;
       int next;
       boolean remainder = multiplereadcount % numWrites != 0;
@@ -66,7 +85,11 @@ public class RMW_IG extends RMW {
           */
 
          toWriteB = ((i % readBetweenWrites) == 0) || (i == multiplereadcount && remainder);
-         next = integerGenerator.nextInt();
+         do {
+            next = integerGenerator.nextInt();
+         }
+         while (avoidRepetition && !alreadyRead.containsKey(next));
+         alreadyRead.put(next, null);
          key = generator.generateKey(0, next);
          if (toWriteB) {
             //If we do not want blind writes, then we have to read the user and then write to it
@@ -84,6 +107,37 @@ public class RMW_IG extends RMW {
             cacheWrapper.get(null, key);
          }
       }
+   }
 
+
+   /**
+    * Execute allowing blindWrites
+    */
+   private void executeWriteOnly(CacheWrapper cacheWrapper) throws Throwable {
+      HashMap<String, ByteIterator> values = new HashMap<String, ByteIterator>();
+      int temp;
+      for (int i = 0; i < YCSB.fieldcount; i++) {
+         String fieldkey = "field" + i;
+         if (trace)
+            log.trace("FieldKey " + fieldkey);
+         temp = YCSB.fieldlengthgenerator.nextInt();
+         if (trace)
+            log.trace("length " + temp);
+         ByteIterator data = new RandomByteIterator(temp);
+         values.put(fieldkey, data);
+      }
+
+      Map<String, String> row = StringByteIterator.getStringMap(values);
+      int next;
+      Object key;
+      for (int i = 1; i <= numWrites; i++) {
+         do {
+            next = integerGenerator.nextInt();
+         }
+         while (avoidRepetition && !alreadyWritten.containsKey(next));
+         alreadyWritten.put(next, null);
+         key = generator.generateKey(0, next);
+         cacheWrapper.put(null, key, row);
+      }
    }
 }

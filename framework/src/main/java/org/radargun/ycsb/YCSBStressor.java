@@ -29,7 +29,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
 
    private CacheWrapper cacheWrapper;
    private int multiplereadcount;
-   private int recordCount;
+   protected int recordCount;
 
 
    private int numWrites = 1;
@@ -40,7 +40,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
 
    //The random should *not* be shared among threads!!
    protected Random r = new Random();
-   private IntegerGenerator ig = null;
+   protected IntegerGenerator ig = null;
 
    public void setCacheWrapper(CacheWrapper cacheWrapper) {
       this.cacheWrapper = cacheWrapper;
@@ -51,7 +51,7 @@ public class YCSBStressor extends AbstractCacheWrapperStressor implements Runnab
       stress(cacheWrapper);
    }
 
-   private YCSBTransaction generateNextTransaction() {
+   protected YCSBTransaction generateNextTransaction() {
       int ran = (Math.abs(r.nextInt())) % 100;
       int keynum = (Math.abs(r.nextInt())) % recordCount;
       if (ran < YCSB.readOnly) {
