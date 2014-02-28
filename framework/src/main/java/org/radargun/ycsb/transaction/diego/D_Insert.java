@@ -16,36 +16,32 @@ import java.util.Map;
  * @author diego
  * @since 4.0
  */
-public class D_Read extends D_YCSBTransaction {
+public class D_Insert extends D_YCSBTransaction {
 
-   public D_Read(IntegerGenerator ig) {
+   public D_Insert(IntegerGenerator ig) {
       super(ig);
    }
 
    @Override
    public void executeTransaction(CacheWrapper cacheWrapper) throws Throwable {
       HashMap<String, ByteIterator> values = new HashMap<String, ByteIterator>();
-      int k = nextKey();
+      int k;
+      do {
+         k = ig.nextInt();
+      }
+      while (k < ig.lastInt());
 
       for (int i = 0; i < YCSB.fieldcount; i++) {
          String fieldkey = "field" + i;
          ByteIterator data = new RandomByteIterator(YCSB.fieldlengthgenerator.nextInt());
          values.put(fieldkey, data);
       }
-      Map<String, String> row = (Map) cacheWrapper.get(null, "user" + k);
-      HashMap<String, ByteIterator> result = new HashMap<String, ByteIterator>();
-      if (row != null) {
-         result.clear();
-         StringByteIterator.putAllAsByteIterators(result, row);
-      }
-   }
-
-   protected int nextKey() {
-      return ig.nextInt();
+      Map<String, String> row = StringByteIterator.getStringMap(values);
+      cacheWrapper.put(null, "user" + k, row);
    }
 
    @Override
    public boolean isReadOnly() {
-      return true;
+      return false;
    }
 }

@@ -43,13 +43,17 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
    protected StatSampler sampler = null;
 
    private String workload = null; //If != null I will use the workload based stressor
-
+   private int numOps;
 
    private YCSBStressor buildYCSBSTressor() {
       if (workload == null)
          return new YCSBStressor();
       else
-         return new D_YCSBStressor(workload);
+         return new D_YCSBStressor(workload,numOps);
+   }
+
+   public void setNumOps(int numOps) {
+      this.numOps = numOps;
    }
 
    @Override
