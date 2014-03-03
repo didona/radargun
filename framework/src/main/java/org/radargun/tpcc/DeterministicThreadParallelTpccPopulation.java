@@ -220,7 +220,7 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
    private boolean isLocalWarehouse(Warehouse warehouseToBePopulated) {
       if (!populateOnlyLocalWarehouses)
          log.info("Populating stocks and districts for all warehouses: there are NO local warehouses, but only local objects.");
-      return populateOnlyLocalWarehouses && warehouseToBePopulated.isLocalToNode(wrapper);
+      return !populateOnlyLocalWarehouses || warehouseToBePopulated.isLocalToNode(wrapper);
    }
 
 
