@@ -3,17 +3,14 @@ package org.radargun.stages;
 
 import org.radargun.CacheWrapper;
 import org.radargun.DistStageAck;
-import org.radargun.stages.AbstractDistStage;
-import org.radargun.stages.DefaultDistStageAck;
 import org.radargun.state.MasterState;
 import org.radargun.stressors.TpccPopulationStressor;
 
 import java.util.List;
 
 /**
- * This stage shuld be run before the <b>TpccBenchmarkStage</b>. It will perform the population of
- * <b>numWarehouses</b> warehouses in cache. Note: this stage won't clear the added data from
- * slave.
+ * This stage shuld be run before the <b>TpccBenchmarkStage</b>. It will perform the population of <b>numWarehouses</b>
+ * warehouses in cache. Note: this stage won't clear the added data from slave.
  * <pre>
  * Params:
  *       - numWarehouses : the number of warehouses to be populated.
@@ -76,6 +73,21 @@ public class TpccPopulationStage extends AbstractDistStage {
     */
    private boolean oneWarmup = false;
 
+   /*
+   If true, fields of objects will be deterministically assigned
+    */
+   private boolean deterministicLoad = false;
+   /*
+   If true, then there is the concept of "local warehouse": in this case only warehouses
+   local to a node will be inserted on this node, together with stocks and orders.
+   Otherwise, warehouses, stocks and orders will be inserted according to the hash function applied
+   on the single object and *not* the warehouse id
+    */
+   private boolean populateOnlyLocalWarehouses = true;
+   /*
+   If true, then also items can be local to a warehouse
+    */
+   private boolean localItems = false;
 
 
    public DistStageAck executeOnSlave() {
@@ -107,9 +119,9 @@ public class TpccPopulationStage extends AbstractDistStage {
       populationStressor.setBatchLevel(batchLevel);
       populationStressor.setPreloadedFromDB(preloadedFromDB);
       populationStressor.setOneWarmup(oneWarmup);
+      populationStressor.setDeterministicLoad(deterministicLoad);
+      populationStressor.setPopulateOnlyLocalWarehouses(this.populateOnlyLocalWarehouses);
       populationStressor.stress(wrapper);
-
-
    }
 
 
@@ -160,17 +172,21 @@ public class TpccPopulationStage extends AbstractDistStage {
       this.oneWarmup = oneWarmup;
    }
 
+   public void setDeterministicLoad(boolean deterministicLoad) {
+      this.deterministicLoad = deterministicLoad;
+   }
+
    @Override
    public String toString() {
       return "TpccPopulationStage {" +
-              "numWarehouses=" + numWarehouses +
-              ", cLastMask=" + cLastMask +
-              ", olIdMask=" + olIdMask +
-              ", cIdMask=" + cIdMask +
-              ", threadParallelLoad=" + threadParallelLoad +
-              ", numLoaderThreads=" + numLoaderThreads +
-              ", batchLevel=" + batchLevel +
-              ", preloadedFromDB=" + preloadedFromDB +
-              ", " + super.toString();
+            "numWarehouses=" + numWarehouses +
+            ", cLastMask=" + cLastMask +
+            ", olIdMask=" + olIdMask +
+            ", cIdMask=" + cIdMask +
+            ", threadParallelLoad=" + threadParallelLoad +
+            ", numLoaderThreads=" + numLoaderThreads +
+            ", batchLevel=" + batchLevel +
+            ", preloadedFromDB=" + preloadedFromDB +
+            ", " + super.toString();
    }
 }

@@ -1,7 +1,15 @@
 package org.radargun.tpcc;
 
 import org.radargun.CacheWrapper;
-import org.radargun.tpcc.domain.*;
+import org.radargun.tpcc.domain.Customer;
+import org.radargun.tpcc.domain.CustomerLookup;
+import org.radargun.tpcc.domain.District;
+import org.radargun.tpcc.domain.Item;
+import org.radargun.tpcc.domain.NewOrder;
+import org.radargun.tpcc.domain.Order;
+import org.radargun.tpcc.domain.OrderLine;
+import org.radargun.tpcc.domain.Stock;
+import org.radargun.tpcc.domain.Warehouse;
 
 import java.util.Date;
 import java.util.Set;
@@ -13,8 +21,16 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpccPopulation {
 
+   private boolean populateOnlyLocalWarehouses = false;
+
+
    public DeterministicThreadParallelTpccPopulation(CacheWrapper wrapper, int numWarehouses, int slaveIndex, int numSlaves, long cLastMask, long olIdMask, long cIdMask, int elementsPerBlock) {
       super(wrapper, numWarehouses, slaveIndex, numSlaves, cLastMask, olIdMask, cIdMask, 1, elementsPerBlock);
+   }
+
+   public DeterministicThreadParallelTpccPopulation(CacheWrapper wrapper, int numWarehouses, int slaveIndex, int numSlaves, long cLastMask, long olIdMask, long cIdMask, int elementsPerBlock, boolean populateOnlyLocalWarehouses) {
+      super(wrapper, numWarehouses, slaveIndex, numSlaves, cLastMask, olIdMask, cIdMask, 1, elementsPerBlock);
+      this.populateOnlyLocalWarehouses = populateOnlyLocalWarehouses;
    }
 
    /*
@@ -36,14 +52,14 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
 
    protected Warehouse createWarehouse(int warehouseId) {
       return new Warehouse(warehouseId,
-              "aaaaaaa",
-              "aaaaaaaaaaa",
-              "aaaaaaaaaaa",
-              "aaaaaaaaaaa",
-              "aa",
-              "aaaa11111",
-              0.1234D,
-              TpccTools.WAREHOUSE_YTD);
+                           "aaaaaaa",
+                           "aaaaaaaaaaa",
+                           "aaaaaaaaaaa",
+                           "aaaaaaaaaaa",
+                           "aa",
+                           "aaaa11111",
+                           0.1234D,
+                           TpccTools.WAREHOUSE_YTD);
    }
 
 
@@ -54,10 +70,10 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
 
       //1<=price<=100
       return new Item(itemId,
-              (itemId % 10000L),
-              "aaaaaaaaaaaaaaa",
-              price,
-              "aaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                      (itemId % 10000L),
+                      "aaaaaaaaaaaaaaa",
+                      price,
+                      "aaaaaaaaaaaaaaaaaaaaaaaaaaa");
    }
 
 
@@ -70,37 +86,37 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
 
       //10<=quantity<=100
       return new Stock(stockId,
-              warehouseId,
-              quantity,
-              "aaaaaaaaaaaaaaaaaaaaaaaa",
-              "aaaaaaaaaaaaaaaaaaaaaaaa",
-              "aaaaaaaaaaaaaaaaaaaaaaaa",
-              "aaaaaaaaaaaaaaaaaaaaaaaa",
-              "aaaaaaaaaaaaaaaaaaaaaaaa",
-              "aaaaaaaaaaaaaaaaaaaaaaaa",
-              "aaaaaaaaaaaaaaaaaaaaaaaa",
-              "aaaaaaaaaaaaaaaaaaaaaaaa",
-              "aaaaaaaaaaaaaaaaaaaaaaaa",
-              "aaaaaaaaaaaaaaaaaaaaaaaa",
-              0,
-              0,
-              0,
-              "aaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                       warehouseId,
+                       quantity,
+                       "aaaaaaaaaaaaaaaaaaaaaaaa",
+                       "aaaaaaaaaaaaaaaaaaaaaaaa",
+                       "aaaaaaaaaaaaaaaaaaaaaaaa",
+                       "aaaaaaaaaaaaaaaaaaaaaaaa",
+                       "aaaaaaaaaaaaaaaaaaaaaaaa",
+                       "aaaaaaaaaaaaaaaaaaaaaaaa",
+                       "aaaaaaaaaaaaaaaaaaaaaaaa",
+                       "aaaaaaaaaaaaaaaaaaaaaaaa",
+                       "aaaaaaaaaaaaaaaaaaaaaaaa",
+                       "aaaaaaaaaaaaaaaaaaaaaaaa",
+                       0,
+                       0,
+                       0,
+                       "aaaaaaaaaaaaaaaaaaaaaaaaaaa");
    }
 
 
    protected District createDistrict(int districtId, int warehouseId) {
       return new District(warehouseId,
-              districtId,
-              "aaaaaaa",
-              "aaaaaaaaaaa",
-              "aaaaaaaaaaa",
-              "aaaaaaaaaaa",
-              "aa",
-              "aaaa11111",
-              0.1234D,
-              TpccTools.WAREHOUSE_YTD,
-              3001);
+                          districtId,
+                          "aaaaaaa",
+                          "aaaaaaaaaaa",
+                          "aaaaaaaaaaa",
+                          "aaaaaaaaaaa",
+                          "aa",
+                          "aaaa11111",
+                          0.1234D,
+                          TpccTools.WAREHOUSE_YTD,
+                          3001);
    }
 
 
@@ -109,23 +125,23 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
       //log.trace("New Customer: WID "+warehouseId+" DID "+districtId+" CID "+customerId);
 
       return new Customer(warehouseId,
-              districtId,
-              customerId,
-              "aaaaaaaaa",
-              "OE",
-              customerLastName,
-              "aaaaaaaaaaa",
-              "aaaaaaaaaaa",
-              "aaaaaaaaaaa",
-              "aa",
-              "aaaa11111",
-              "aaaaaaaaaaaaaaaa",
-              new Date(1364752545391L),
-              (customerId % 1000 == 1) ? "BC" : "GC",
-              500000.0,
-              0.4,
-              -10.0, 10.0, 1, 0,
-              "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                          districtId,
+                          customerId,
+                          "aaaaaaaaa",
+                          "OE",
+                          customerLastName,
+                          "aaaaaaaaaaa",
+                          "aaaaaaaaaaa",
+                          "aaaaaaaaaaa",
+                          "aa",
+                          "aaaa11111",
+                          "aaaaaaaaaaaaaaaa",
+                          new Date(1364752545391L),
+                          (customerId % 1000 == 1) ? "BC" : "GC",
+                          500000.0,
+                          0.4,
+                          -10.0, 10.0, 1, 0,
+                          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
    }
 
 
@@ -138,13 +154,13 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
       //1<=customer<=TpccTools.NB_MAX_CUSTOMER-1
 
       return new Order(orderId,
-              districtId,
-              warehouseId,
-              customer,
-              aDate,
-              (orderId < TpccTools.LIMIT_ORDER) ? 5 : 0,
-              6,
-              1);
+                       districtId,
+                       warehouseId,
+                       customer,
+                       aDate,
+                       (orderId < TpccTools.LIMIT_ORDER) ? 5 : 0,
+                       6,
+                       1);
    }
 
 
@@ -179,13 +195,13 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
                return new PopulateWarehouseThread(threadIdx, lowerBound, upperBound);
             }
          });
-
+         log.info("Warehouses object populated");
          Warehouse warehouseToBePopulated;
          for (int i = 1; i <= this.numWarehouses; i++) {
 
             warehouseToBePopulated = createWarehouse(i);
 
-            if (warehouseToBePopulated.isLocalToNode(wrapper)) {
+            if (isLocalWarehouse(warehouseToBePopulated)) {
 
                log.info(" WAREHOUSE " + i);
 
@@ -201,8 +217,18 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
 
    }
 
+   private boolean isLocalWarehouse(Warehouse warehouseToBePopulated) {
+      if (!populateOnlyLocalWarehouses)
+         log.info("Populating stocks and districts for all warehouses: there are NO local warehouses, but only local objects.");
+      return populateOnlyLocalWarehouses && warehouseToBePopulated.isLocalToNode(wrapper);
+   }
+
 
    @Override
+   /**
+    * Populate ALL items on EACH node: of course a node will actually insert only the items
+    * that are local to it
+    */
    protected void populateItem() {
       log.trace("Populating Items");
 
@@ -281,7 +307,7 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
       log.trace("Populating Customers for warehouse " + warehouseId + " and district " + districtId);
 
       final ConcurrentHashMap<CustomerLookupQuadruple, LinkedBlockingQueue<Long>> lookupContentionAvoidance =
-              new ConcurrentHashMap<CustomerLookupQuadruple, LinkedBlockingQueue<Long>>();
+            new ConcurrentHashMap<CustomerLookupQuadruple, LinkedBlockingQueue<Long>>();
 
       performMultiThreadPopulation(1, TpccTools.NB_MAX_CUSTOMER, new ThreadCreator() {
          @Override
@@ -325,15 +351,15 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
 
 
          OrderLine newOrderLine = new OrderLine(id_order,
-                 id_district,
-                 id_wharehouse,
-                 i,
-                 50000,
-                 id_wharehouse,
-                 delivery_date,
-                 5,
-                 amount,
-                 "aaaaaaaaaaaaa");
+                                                id_district,
+                                                id_wharehouse,
+                                                i,
+                                                50000,
+                                                id_wharehouse,
+                                                delivery_date,
+                                                5,
+                                                amount,
+                                                "aaaaaaaaaaaaa");
 
 
          boolean successful = false;
@@ -380,11 +406,11 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
       @Override
       public String toString() {
          return "PopulateCustomerThread{" +
-                 "lowerBound=" + lowerBound +
-                 ", upperBound=" + upperBound +
-                 ", warehouseId=" + warehouseId +
-                 ", districtId=" + districtId +
-                 '}';
+               "lowerBound=" + lowerBound +
+               ", upperBound=" + upperBound +
+               ", warehouseId=" + warehouseId +
+               ", districtId=" + districtId +
+               '}';
       }
 
       @SuppressWarnings("unchecked")
@@ -477,9 +503,9 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
       @Override
       public String toString() {
          return "DeterministicPopulateCustomerLookupThread{" +
-                 "lowerBound=" + lowerBound +
-                 ", upperBound=" + upperBound +
-                 '}';
+               "lowerBound=" + lowerBound +
+               ", upperBound=" + upperBound +
+               '}';
       }
 
       @SuppressWarnings("unchecked")
@@ -542,9 +568,9 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
       @Override
       public String toString() {
          return "PopulateWarehouseThread{" +
-                 "lowerBound=" + lowerBound +
-                 ", upperBound=" + upperBound +
-                 '}';
+               "lowerBound=" + lowerBound +
+               ", upperBound=" + upperBound +
+               '}';
       }
 
       public PopulateWarehouseThread(int threadIdx, long low, long up) {
@@ -599,10 +625,10 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
       @Override
       public String toString() {
          return "PopulateDistrictThread{" +
-                 "lowerBound=" + lowerBound +
-                 ", upperBound=" + upperBound +
-                 ", warehouseId=" + warehouseId +
-                 '}';
+               "lowerBound=" + lowerBound +
+               ", upperBound=" + upperBound +
+               ", warehouseId=" + warehouseId +
+               '}';
       }
 
       public PopulateDistrictThread(int threadIdx, long low, long up, int warehouseId) {

@@ -4,7 +4,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
 import org.radargun.stages.TpccPopulationStage;
-import org.radargun.tpcc.*;
+import org.radargun.tpcc.DeterministicThreadParallelTpccPopulation;
+import org.radargun.tpcc.PassiveReplicationTpccPopulation;
+import org.radargun.tpcc.ThreadParallelTpccPopulation;
+import org.radargun.tpcc.TpccPopulation;
 
 import java.util.Map;
 
@@ -35,6 +38,7 @@ public class TpccPopulationStressor extends AbstractCacheWrapperStressor {
    //For thread-grain parallel warmup
    private boolean threadParallelLoad = false;
    private boolean deterministicLoad = false;
+   private boolean populateOnlyLocalWarehouses = false;
 
    private int numLoadersThread = 4;
 
@@ -67,23 +71,23 @@ public class TpccPopulationStressor extends AbstractCacheWrapperStressor {
       if (wrapper.isPassiveReplication()) {
          log.info("Performing passive-replication aware population...");
          tpccPopulation = new PassiveReplicationTpccPopulation(wrapper, numWarehouses, slaveIndex,
-                 numSlaves, cLastMask, olIdMask,
-                 cIdMask, (threadParallelLoad ? numLoadersThread : 1),
-                 batchLevel);
+                                                               numSlaves, cLastMask, olIdMask,
+                                                               cIdMask, (threadParallelLoad ? numLoadersThread : 1),
+                                                               batchLevel);
       } else if (this.threadParallelLoad) {
          log.info("Performing thread-parallel population...");
          tpccPopulation = new ThreadParallelTpccPopulation(wrapper, this.numWarehouses, this.slaveIndex,
-                 this.numSlaves, this.cLastMask, this.olIdMask,
-                 this.cIdMask, this.numLoadersThread, this.batchLevel);
+                                                           this.numSlaves, this.cLastMask, this.olIdMask,
+                                                           this.cIdMask, this.numLoadersThread, this.batchLevel);
       } else if (this.deterministicLoad) {
          log.info("Performing DETERMINISTIC thread-parallel population...");
          tpccPopulation = new DeterministicThreadParallelTpccPopulation(wrapper, this.numWarehouses, this.slaveIndex,
-                 this.numSlaves, this.cLastMask, this.olIdMask,
-                 this.cIdMask, this.batchLevel);
+                                                                        this.numSlaves, this.cLastMask, this.olIdMask,
+                                                                        this.cIdMask, this.batchLevel, this.populateOnlyLocalWarehouses);
       } else {
          log.info("Performing population...");
          tpccPopulation = new TpccPopulation(wrapper, this.numWarehouses, this.slaveIndex, this.numSlaves,
-                 this.cLastMask, this.olIdMask, this.cIdMask);
+                                             this.cLastMask, this.olIdMask, this.cIdMask);
       }
 
       if (preloadedFromDB) {
@@ -118,7 +122,7 @@ public class TpccPopulationStressor extends AbstractCacheWrapperStressor {
 
    private void setWarmedUp(CacheWrapper cacheWrapper) {
       if (cacheWrapper.isPassiveReplication() && cacheWrapper.isTheMaster()
-              || (!cacheWrapper.isPassiveReplication() && slaveIndex == 0)) {
+            || (!cacheWrapper.isPassiveReplication() && slaveIndex == 0)) {
          boolean sux = false;
 
          do {
@@ -138,19 +142,21 @@ public class TpccPopulationStressor extends AbstractCacheWrapperStressor {
    @Override
    public String toString() {
       return "TpccPopulationStressor{" +
-              "numWarehouses=" + this.numWarehouses +
-              ", cLastMask=" + TpccTools.A_C_LAST +
-              ", olIdMask=" + TpccTools.A_OL_I_ID +
-              ", cIdMask=" + TpccTools.A_C_ID +
-              ", slaveIndex=" + this.slaveIndex +
-              ", numSlaves=" + this.numSlaves +
-              ", threadParallelLoad=" + threadParallelLoad +
-              ", numLoadersThread=" + numLoadersThread +
-              ", batchLevel=" + batchLevel +
-              ", preloadedFromDB=" + preloadedFromDB +
-              "}";
+            "numWarehouses=" + numWarehouses +
+            ", cLastMask=" + cLastMask +
+            ", olIdMask=" + olIdMask +
+            ", cIdMask=" + cIdMask +
+            ", slaveIndex=" + slaveIndex +
+            ", numSlaves=" + numSlaves +
+            ", threadParallelLoad=" + threadParallelLoad +
+            ", deterministicLoad=" + deterministicLoad +
+            ", populateOnlyLocalWarehouses=" + populateOnlyLocalWarehouses +
+            ", numLoadersThread=" + numLoadersThread +
+            ", batchLevel=" + batchLevel +
+            ", preloadedFromDB=" + preloadedFromDB +
+            ", oneWarmup=" + oneWarmup +
+            '}';
    }
-
 
    public void destroy() throws Exception {
       //Don't destroy data in cache!
@@ -202,5 +208,9 @@ public class TpccPopulationStressor extends AbstractCacheWrapperStressor {
 
    public void setDeterministicLoad(boolean deterministicLoad) {
       this.deterministicLoad = deterministicLoad;
+   }
+
+   public void setPopulateOnlyLocalWarehouses(boolean populateOnlyLocalWarehouses) {
+      this.populateOnlyLocalWarehouses = populateOnlyLocalWarehouses;
    }
 }
