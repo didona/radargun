@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.radargun.CacheWrapper;
 import org.radargun.stages.TpccPopulationStage;
 import org.radargun.tpcc.DeterministicThreadParallelTpccPopulation;
+import org.radargun.tpcc.Diego_DeterministicPopulation;
 import org.radargun.tpcc.PassiveReplicationTpccPopulation;
 import org.radargun.tpcc.ThreadParallelTpccPopulation;
 import org.radargun.tpcc.TpccPopulation;
@@ -38,6 +39,7 @@ public class TpccPopulationStressor extends AbstractCacheWrapperStressor {
    //For thread-grain parallel warmup
    private boolean threadParallelLoad = false;
    private boolean deterministicLoad = false;
+   private boolean diegoLoad = false;
    private boolean populateOnlyLocalWarehouses = false;
 
    private int numLoadersThread = 4;
@@ -74,6 +76,11 @@ public class TpccPopulationStressor extends AbstractCacheWrapperStressor {
                                                                numSlaves, cLastMask, olIdMask,
                                                                cIdMask, (threadParallelLoad ? numLoadersThread : 1),
                                                                batchLevel);
+      } else if (this.diegoLoad) {
+         log.info("Loading with diego method");
+         tpccPopulation = new Diego_DeterministicPopulation(wrapper, this.numWarehouses, this.slaveIndex,
+                                                            this.numSlaves, this.cLastMask, this.olIdMask,
+                                                            this.cIdMask, this.populateOnlyLocalWarehouses);
       } else if (this.threadParallelLoad) {
          log.info("Performing thread-parallel population...");
          tpccPopulation = new ThreadParallelTpccPopulation(wrapper, this.numWarehouses, this.slaveIndex,
@@ -212,5 +219,9 @@ public class TpccPopulationStressor extends AbstractCacheWrapperStressor {
 
    public void setPopulateOnlyLocalWarehouses(boolean populateOnlyLocalWarehouses) {
       this.populateOnlyLocalWarehouses = populateOnlyLocalWarehouses;
+   }
+
+   public void setDiegoLoad(boolean diegoLoad) {
+      this.diegoLoad = diegoLoad;
    }
 }

@@ -535,7 +535,7 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
             CustomerLookup customerLookup;
             LinkedBlockingQueue<Long> ids;
             for (CustomerLookupQuadruple k : keys) {
-
+               log.trace(k.toString());
                customerLookup = new CustomerLookup(k.getC_last(), k.getWarehouseId(), k.getDistrictId());
                ids = map.get(k);
 

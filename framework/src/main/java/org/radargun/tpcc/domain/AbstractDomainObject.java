@@ -6,12 +6,11 @@ import org.radargun.CacheWrapper;
 import org.radargun.tpcc.DomainObject;
 
 /**
- * @author Diego Didona, didona@gsd.inesc-id.pt
- *         Date: 20/12/12
+ * @author Diego Didona, didona@gsd.inesc-id.pt Date: 20/12/12
  */
 public abstract class AbstractDomainObject implements DomainObject {
 
-   Log log = LogFactory.getLog(AbstractDomainObject.class);
+   private static final Log log = LogFactory.getLog(AbstractDomainObject.class);
 
    protected abstract Object getKey();
 

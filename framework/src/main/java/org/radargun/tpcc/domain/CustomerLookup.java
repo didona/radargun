@@ -209,5 +209,15 @@ public class CustomerLookup extends AbstractDomainObject implements Externalizab
       protected Object generateId(int slaveIndex) {
          return null;  //To change body of implemented methods use File | Settings | File Templates.
       }
+
+   @Override
+   public String toString() {
+      return "CustomerLookup{" +
+            "c_w_id=" + c_w_id +
+            ", c_d_id=" + c_d_id +
+            ", c_last='" + c_last + '\'' +
+            ", ids=" + ids +
+            '}';
+   }
 }
 

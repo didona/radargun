@@ -103,6 +103,7 @@ public class TpccTerminal {
    public final TpccTransaction choiceTransaction(boolean isPassiveReplication, boolean isTheMaster, int threadId) {
       return createTransaction(chooseTransactionType(isPassiveReplication, isTheMaster), threadId);
    }
+   final static boolean debug = log.isDebugEnabled();
 
    public final int chooseTransactionType(boolean isPassiveReplication, boolean isTheMaster) {
       double transactionType = Math.min(tpccTools.doubleRandomNumber(1, 100), 100.0);
@@ -119,7 +120,7 @@ public class TpccTerminal {
          }
       }
 
-      if (log.isDebugEnabled()) {
+      if (debug) {
          log.debug("Choose transaction " + transactionType +
                  ". Payment Weight=" + realPaymentWeight + "(" + paymentWeight + ")" +
                  ", Order Status Weight=" + realOrderStatusWeight + "(" + orderStatusWeight + ")");

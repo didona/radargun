@@ -89,6 +89,12 @@ public class TpccPopulationStage extends AbstractDistStage {
     */
    private boolean localItems = false;
 
+   /**
+    * If true, try to use the plain old population, with tentative deterministic load and only actual load of data that
+    * are local to the node
+    */
+   private boolean diegoLoad = false;
+
 
    public DistStageAck executeOnSlave() {
       DefaultDistStageAck ack = newDefaultStageAck();
@@ -121,6 +127,7 @@ public class TpccPopulationStage extends AbstractDistStage {
       populationStressor.setOneWarmup(oneWarmup);
       populationStressor.setDeterministicLoad(deterministicLoad);
       populationStressor.setPopulateOnlyLocalWarehouses(this.populateOnlyLocalWarehouses);
+      populationStressor.setDiegoLoad(this.diegoLoad);
       populationStressor.stress(wrapper);
    }
 
@@ -178,6 +185,10 @@ public class TpccPopulationStage extends AbstractDistStage {
 
    public void setPopulateOnlyLocalWarehouses(boolean populateOnlyLocalWarehouses) {
       this.populateOnlyLocalWarehouses = populateOnlyLocalWarehouses;
+   }
+
+   public void setDiegoLoad(boolean b) {
+      this.diegoLoad = b;
    }
 
    @Override

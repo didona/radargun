@@ -20,7 +20,7 @@ import static org.radargun.utils.Utils.memString;
  */
 public class TpccPopulation {
 
-   private static Log log = LogFactory.getLog(TpccPopulation.class);
+   protected static Log log = LogFactory.getLog(TpccPopulation.class);
 
    private long POP_C_LAST = TpccTools.NULL_NUMBER;
 
@@ -192,13 +192,17 @@ public class TpccPopulation {
       return POP_OL_I_ID;
    }
 
+   protected boolean splitWorkAmongNodes() {
+      return numSlaves > 1;
+   }
+
    protected void populateItem() {
       log.trace("Populate Items");
 
       long init_id_item = 1;
       long num_of_items = TpccTools.NB_MAX_ITEM;
 
-      if (numSlaves > 1) {
+      if (splitWorkAmongNodes()) {
          num_of_items = TpccTools.NB_MAX_ITEM / numSlaves;
          long remainder = TpccTools.NB_MAX_ITEM % numSlaves;
 
@@ -244,7 +248,7 @@ public class TpccPopulation {
       long init_id_item = 1;
       long num_of_items = TpccTools.NB_MAX_ITEM;
 
-      if (numSlaves > 1) {
+      if (splitWorkAmongNodes()) {
          num_of_items = TpccTools.NB_MAX_ITEM / numSlaves;
          long remainder = TpccTools.NB_MAX_ITEM % numSlaves;
 
@@ -272,7 +276,7 @@ public class TpccPopulation {
       int init_districtId = 1;
       int num_of_districts = TpccTools.NB_MAX_DISTRICT;
 
-      if (numSlaves > 1) {
+      if (splitWorkAmongNodes()) {
          num_of_districts = TpccTools.NB_MAX_DISTRICT / numSlaves;
          int remainder = TpccTools.NB_MAX_DISTRICT % numSlaves;
 
@@ -293,6 +297,10 @@ public class TpccPopulation {
       }
    }
 
+   protected String _c_last(int customerdId) {
+      return c_last();
+   }
+
    protected void populateCustomers(int warehouseId, int districtId) {
       if (warehouseId < 0 || districtId < 0) {
          log.warn("Trying to populate Customer with a negative warehouse or district ID. skipping...");
@@ -301,7 +309,7 @@ public class TpccPopulation {
 
       logCustomerPopulation(warehouseId, districtId, 1, TpccTools.NB_MAX_CUSTOMER);
       for (int customerId = 1; customerId <= TpccTools.NB_MAX_CUSTOMER; customerId++) {
-         String c_last = c_last();
+         String c_last = _c_last(customerId);
 
          txAwarePut(createCustomer(warehouseId, districtId, customerId, c_last));
 
@@ -567,7 +575,7 @@ public class TpccPopulation {
                           tpccTools.get().aleaChainec(300, 500));
    }
 
-   protected final History createHistory(long customerId, long districtId, long warehouseId) {
+   protected History createHistory(long customerId, long districtId, long warehouseId) {
       return new History(customerId,
                          districtId,
                          warehouseId,
