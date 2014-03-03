@@ -176,9 +176,13 @@ public class TpccPopulationStage extends AbstractDistStage {
       this.deterministicLoad = deterministicLoad;
    }
 
+   public void setPopulateOnlyLocalWarehouses(boolean populateOnlyLocalWarehouses) {
+      this.populateOnlyLocalWarehouses = populateOnlyLocalWarehouses;
+   }
+
    @Override
    public String toString() {
-      return "TpccPopulationStage {" +
+      return "TpccPopulationStage{" +
             "numWarehouses=" + numWarehouses +
             ", cLastMask=" + cLastMask +
             ", olIdMask=" + olIdMask +
@@ -187,6 +191,10 @@ public class TpccPopulationStage extends AbstractDistStage {
             ", numLoaderThreads=" + numLoaderThreads +
             ", batchLevel=" + batchLevel +
             ", preloadedFromDB=" + preloadedFromDB +
-            ", " + super.toString();
+            ", oneWarmup=" + oneWarmup +
+            ", deterministicLoad=" + deterministicLoad +
+            ", populateOnlyLocalWarehouses=" + populateOnlyLocalWarehouses +
+            ", localItems=" + localItems +
+            '}' + super.toString();
    }
 }
