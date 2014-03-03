@@ -2,6 +2,7 @@ package org.radargun.tpcc;
 
 import org.radargun.CacheWrapper;
 import org.radargun.tpcc.domain.Customer;
+import org.radargun.tpcc.domain.District;
 import org.radargun.tpcc.domain.History;
 import org.radargun.tpcc.domain.Item;
 import org.radargun.tpcc.domain.Order;
@@ -82,6 +83,20 @@ public class Diego_DeterministicPopulation extends TpccPopulation {
                        0,
                        0,
                        "aaaaaaaaaaaaaaaaaaaaaaaaaaa");
+   }
+
+   protected District createDistrict(int districtId, int warehouseId) {
+      return new District(warehouseId,
+                          districtId,
+                          "aaaaaaa",
+                          "aaaaaaaaaaa",
+                          "aaaaaaaaaaa",
+                          "aaaaaaaaaaa",
+                          "aa",
+                          "aaaa11111",
+                          0.1234D,
+                          TpccTools.WAREHOUSE_YTD,
+                          3001);
    }
 
    public String deterministic_c_last(long seed) {
@@ -212,6 +227,57 @@ public class Diego_DeterministicPopulation extends TpccPopulation {
          }
 
       }
+   }
+
+   protected boolean txAwarePut(DomainObject domainObject) {
+
+      boolean putDone = false;
+      do {
+         try {
+            domainObject.storeToPopulate(wrapper, slaveIndex, true);
+            putDone = true;
+            log.trace("Successfully put " + domainObject);
+         } catch (Throwable e) {
+            logErrorWhilePut(domainObject, e);
+         }
+      } while (!putDone);
+
+
+      return true;
+
+   }
+
+
+   protected final boolean txAwareLoad(DomainObject domainObject) {
+      if (wrapper.isInTransaction()) {
+         System.out.println("Diego_DeterministiPopulation: In transaction?");
+         try {
+            domainObject.load(wrapper);
+         } catch (Throwable throwable) {
+            return false;
+         }
+      } else {
+         boolean loadDone = false;
+         do {
+            try {
+               domainObject.load(wrapper);
+               loadDone = true;
+            } catch (Throwable e) {
+               logErrorWhileGet(domainObject, e);
+            }
+         } while (!loadDone);
+      }
+      return true;
+   }
+
+   private void logErrorWhilePut(Object object, Throwable throwable) {
+      log.error("Error while trying to perform a put operation. Object is " + object +
+                      ". Error is " + throwable.getLocalizedMessage() + ". Retrying...", throwable);
+   }
+
+   private void logErrorWhileGet(Object object, Throwable throwable) {
+      log.error("Error while trying to perform a Get operation. Object is " + object +
+                      ". Error is " + throwable.getLocalizedMessage() + ". Retrying...", throwable);
    }
 
 

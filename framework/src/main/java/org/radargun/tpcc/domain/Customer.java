@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * @author peluso@gsd.inesc-id.pt , peluso@dis.uniroma1.it
  */
-public class Customer extends AbstractDomainObject implements Serializable,Comparable {
+public class Customer extends AbstractDomainObject implements Serializable, Comparable {
 
    /* district id */
    private long c_d_id;
@@ -271,9 +271,9 @@ public class Customer extends AbstractDomainObject implements Serializable,Compa
 
    @Override
    public void storeToPopulate(CacheWrapper wrapper, int nodeIndex, boolean localOnly) throws Throwable {
-      String key = getKey();
-      if (localOnly) {
 
+      if (localOnly) {
+         wrapper.putIfLocal(null, getKey(), this);
       } else {
          store(wrapper, nodeIndex);
       }
@@ -353,6 +353,7 @@ public class Customer extends AbstractDomainObject implements Serializable,Compa
       return true;
    }
 
+
    @Override
    public int hashCode() {
       int result;
@@ -385,7 +386,6 @@ public class Customer extends AbstractDomainObject implements Serializable,Compa
       return result;
 
    }
-
 
 
 }

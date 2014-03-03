@@ -45,7 +45,6 @@ public class DeterministicThreadParallelTpccPopulation extends ThreadParallelTpc
       } catch (Throwable throwable) {
          return false;
       }
-
       return true;
    }
 

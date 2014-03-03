@@ -28,5 +28,8 @@ public abstract class AbstractDomainObject implements DomainObject {
       wrapper.put(null, id, this, threadId);
    }
 
+   public String toString() {
+      return this.getKey().toString();
+   }
 
 }

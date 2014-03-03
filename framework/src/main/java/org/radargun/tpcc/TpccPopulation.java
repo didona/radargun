@@ -418,7 +418,7 @@ public class TpccPopulation {
       return true;
    }
 
-   protected final boolean txAwareLoad(DomainObject domainObject) {
+   protected boolean txAwareLoad(DomainObject domainObject) {
       if (wrapper.isInTransaction()) {
          try {
             domainObject.load(wrapper);
