@@ -88,7 +88,7 @@ public class RMW_IG extends RMW {
          do {
             next = integerGenerator.nextInt();
          }
-         while (avoidRepetition && !alreadyRead.containsKey(next));
+         while (avoidRepetition && alreadyRead.containsKey(next));
          alreadyRead.put(next, null);
          key = generator.generateKey(0, next);
          if (toWriteB) {

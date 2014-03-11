@@ -254,6 +254,8 @@ public class TpccStressor extends AbstractCacheWrapperStressor {
 
       } catch (Exception e) {
          log.error("Error", e);
+         log.error("Error while trying to retrieve parameters for TpccTools");
+         System.out.println("Error while trying to retrieve parameters for TpccTools");
       }
    }
 
