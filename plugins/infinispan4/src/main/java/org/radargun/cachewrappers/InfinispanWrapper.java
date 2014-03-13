@@ -339,6 +339,8 @@ public class InfinispanWrapper implements CacheWrapper {
    @Override
    public Map<String, String> getAdditionalStats() {
       Map<String, String> results = new HashMap<String, String>();
+      if (transport != null)
+         results.put("IP_ADDR", transport.getAddress().toString());
       MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
       String cacheComponentString = getCacheComponentBaseString(mBeanServer);
       if (cacheComponentString != null) {

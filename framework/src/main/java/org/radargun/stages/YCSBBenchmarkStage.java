@@ -9,6 +9,7 @@ import org.radargun.ycsb.YCSB;
 import org.radargun.ycsb.YCSBStressor;
 import org.radargun.ycsb.generators.CounterGenerator;
 import org.radargun.ycsb.generators.DZipfianGenerator;
+import org.radargun.ycsb.generators.HotspotIntegerGenerator;
 import org.radargun.ycsb.generators.IntegerGenerator;
 import org.radargun.ycsb.generators.SkewedLatestGenerator;
 import org.radargun.ycsb.generators.UniformIntegerGenerator;
@@ -41,6 +42,8 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
    private int dzipf_groups = 0;
    protected long statsSamplingInterval = 0L;
    protected StatSampler sampler = null;
+   protected double dataHotSpot = 0.01;
+   protected double reqHotSpot = 0.99;
 
    private String workload = null; //If != null I will use the workload based stressor
    private int numOps;
@@ -49,7 +52,7 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
       if (workload == null)
          return new YCSBStressor();
       else
-         return new D_YCSBStressor(workload,numOps);
+         return new D_YCSBStressor(workload, numOps);
    }
 
    public void setNumOps(int numOps) {
@@ -272,6 +275,8 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
             return new SkewedLatestGenerator(new CounterGenerator(recordCount), zipf_const);
          case ZIPF:
             return new ZipfianGenerator(recordCount, zipf_const);
+         case HOTSPOT:
+            return new HotspotIntegerGenerator(0, recordCount, dataHotSpot, reqHotSpot);
          case D_ZIPF: {
             if (dzipf_groups == 0)
                throw new IllegalArgumentException("DZIPF generator but no groups specified!");
@@ -285,8 +290,16 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
 
    }
 
+   public void setDataHotSpot(double dataHotSpot) {
+      this.dataHotSpot = dataHotSpot;
+   }
+
+   public void setReqHotSpot(double reqHotSpot) {
+      this.reqHotSpot = reqHotSpot;
+   }
+
    private enum e_gen {
-      UNIFORM, ZIPF, SKEWED_LAST, D_ZIPF
+      UNIFORM, ZIPF, SKEWED_LAST, D_ZIPF, HOTSPOT
    }
 
 }
