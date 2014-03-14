@@ -19,12 +19,10 @@ package org.radargun.ycsb.generators;
 import java.util.Random;
 
 /**
- * Generate integers resembling a hotspot distribution where x% of operations
- * access y% of data items. The parameters specify the bounds for the numbers,
- * the percentage of the of the interval which comprises the hot set and
- * the percentage of operations that access the hot set. Numbers of the hot set are
- * always smaller than any number in the cold set. Elements from the hot set and
- * the cold set are chose using a uniform distribution.
+ * Generate integers resembling a hotspot distribution where x% of operations access y% of data items. The parameters
+ * specify the bounds for the numbers, the percentage of the of the interval which comprises the hot set and the
+ * percentage of operations that access the hot set. Numbers of the hot set are always smaller than any number in the
+ * cold set. Elements from the hot set and the cold set are chose using a uniform distribution.
  *
  * @author sudipto
  */
@@ -58,7 +56,7 @@ public class HotspotIntegerGenerator extends IntegerGenerator {
       }
       if (lowerBound > upperBound) {
          System.err.println("Upper bound of Hotspot generator smaller than the lower bound. " +
-                 "Swapping the values.");
+                                  "Swapping the values.");
          int temp = lowerBound;
          lowerBound = upperBound;
          upperBound = temp;
@@ -71,6 +69,7 @@ public class HotspotIntegerGenerator extends IntegerGenerator {
       this.coldInterval = interval - hotInterval;
       this.hotOpnFraction = hotOpnFraction;
       random = new Random();
+      System.out.println("Hot interval " + hotInterval + " = Cold interval " + coldInterval);
    }
 
    @Override
@@ -118,6 +117,6 @@ public class HotspotIntegerGenerator extends IntegerGenerator {
    @Override
    public double mean() {
       return hotOpnFraction * (lowerBound + hotInterval / 2.0)
-              + (1 - hotOpnFraction) * (lowerBound + hotInterval + coldInterval / 2.0);
+            + (1 - hotOpnFraction) * (lowerBound + hotInterval + coldInterval / 2.0);
    }
 }

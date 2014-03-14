@@ -130,6 +130,8 @@ public class YCSBBenchmarkStage extends AbstractDistStage {
          results.put("NUM_KEYS", str(recordCount));
          results.put("DATA_ACCESS_PATTERN", str(generator));
          results.put("SKEW", String.valueOf(zipf_const));
+         results.put("DATA_HS", String.valueOf(dataHotSpot));
+         results.put("REQUEST_HS", String.valueOf(reqHotSpot));
          results.put("CPU_USAGE", str(sampler != null ? sampler.getAvgCpuUsage() : "Not_Available"));
          results.put("MEM_USAGE", str(sampler != null ? sampler.getAvgMemUsage() : "Not_Available"));
          results.putAll(cacheWrapper.getAdditionalStats());

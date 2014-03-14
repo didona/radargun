@@ -19,6 +19,7 @@ import org.infinispan.util.concurrent.TimeoutException;
 import org.radargun.CacheWrapper;
 import org.radargun.cachewrappers.parser.StatisticComponent;
 import org.radargun.cachewrappers.parser.StatsParser;
+import org.radargun.stressors.ContentionYCSBStringKeyGenerator;
 import org.radargun.utils.TypedProperties;
 import org.radargun.utils.Utils;
 
@@ -341,6 +342,16 @@ public class InfinispanWrapper implements CacheWrapper {
       Map<String, String> results = new HashMap<String, String>();
       if (transport != null)
          results.put("IP_ADDR", transport.getAddress().toString());
+      long po = 0;
+      for (int i = 0; i < 1000; i++) {
+         ContentionYCSBStringKeyGenerator c = (ContentionYCSBStringKeyGenerator) Utils.instantiate("org.radargun.stressors.ContentionYCSBStringKeyGenerator");
+         Object k = c.generateKey(0, 0, i);
+         if (isPrimaryOwner(k)) {
+            log.trace(k.toString() + " Primary owner of " + i);
+            po++;
+         }
+      }
+      results.put("PRIMARY_OWNED", String.valueOf(po));
       MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
       String cacheComponentString = getCacheComponentBaseString(mBeanServer);
       if (cacheComponentString != null) {
@@ -360,6 +371,10 @@ public class InfinispanWrapper implements CacheWrapper {
    @Override
    public boolean isPassiveReplication() {
       return cache.getCacheConfiguration().transaction().transactionProtocol() == TransactionProtocol.PASSIVE_REPLICATION;
+   }
+
+   public boolean isPrimaryOwner(Object k) {
+      return cache.getAdvancedCache().getDistributionManager().getPrimaryLocation(k).equals(transport.getAddress());
    }
 
    @Override

@@ -3,7 +3,6 @@ package org.radargun;
 
 import org.radargun.utils.TypedProperties;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -152,6 +151,8 @@ public interface CacheWrapper {
 
    void dumpHistograms();
 
-   public void  initHashIfNecessary();
+   public void initHashIfNecessary();
+
+   public boolean isPrimaryOwner(Object k);
 
 }
